@@ -1,3 +1,7 @@
+const baseUrl = window.location.hostname.includes('repl.co') 
+    ? `https://${window.location.hostname}`
+    : 'http://127.0.0.1:3000';
+
 const username = document.getElementById("username");
 const password = document.getElementById("password");
 const logsub = document.getElementById("logsub");
@@ -84,7 +88,7 @@ if (selbtn) {
     };
 
     // Send a POST request
-    fetch("http://127.0.0.1:3000/getQuiz", {
+    fetch("/getQuiz", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -100,7 +104,7 @@ if (selbtn) {
         console.error("Error:", error);
     })
     .then( () => {
-      window.location.href = "http://127.0.0.1:3000/getQuiz";
+      window.location.href = "/getQuiz";
     })
   })
 }
@@ -219,7 +223,7 @@ if (quiz) {
     }
     const answersObject = Object.fromEntries(answers);
     let sc;
-    fetch("http://127.0.0.1:3000/getScore", {
+    fetch("/getScore", {
       method: "POST",
       headers: {
           "Content-Type": "application/json"
@@ -252,11 +256,11 @@ const qc = document.getElementById("qc");
 const codeIP = document.getElementById("codeIP");
 if (tryQ) {
     tryQ.addEventListener("click", () => {
-        window.location.href = "http://127.0.0.1:3000/getTopicPage";
+        window.location.href = "/getTopicPage";
     })
 
     myoq.addEventListener("click", () => {
-        window.location.href = "http://127.0.0.1:3000/makeQuiz";
+        window.location.href = "/makeQuiz";
     })
 
     qc.addEventListener("click", () => {
@@ -268,7 +272,7 @@ if (tryQ) {
         };
 
         // Send a POST request
-        fetch("http://127.0.0.1:3000/getQuiz", {
+        fetch("/getQuiz", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -283,7 +287,7 @@ if (tryQ) {
             console.error("Error:", error);
         })
         .then( () => {
-            window.location.href = "http://127.0.0.1:3000/getQuiz";
+            window.location.href = "/getQuiz";
         })
     });
 }
@@ -430,7 +434,7 @@ if (myquiztb) {
       const data = {
           username: uname
       };
-      fetch('http://127.0.0.1:3000/myquizzes', {
+      fetch('/myquizzes', {
           method: "POST",
           headers: {
               "Content-Type": "application/json"
@@ -464,7 +468,7 @@ if (myanstb) {
       const data = {
           username: uname
       };
-      fetch('http://127.0.0.1:3000/myanswers', {
+      fetch('/myanswers', {
           method: "POST",
           headers: {
               "Content-Type": "application/json"
@@ -474,7 +478,6 @@ if (myanstb) {
       .then (response => response.json())
       .then (myanswers => {
           const anstbody = document.getElementById('myanstb');
-          console.log(myanswers);
           myanswers.forEach((ind, index) => {
               const row = document.createElement('tr');
               row.innerHTML = `
@@ -496,7 +499,7 @@ function leaderboard() {
     code: localStorage.getItem("code")
   };
   // Send a POST request
-  fetch("http://127.0.0.1:3000/leaderboard", {
+  fetch("/leaderboard", {
       method: "POST",
       headers: {
           "Content-Type": "application/json"
@@ -507,7 +510,7 @@ function leaderboard() {
   .then( data => {
       let top10 = data.Top10;
       localStorage.setItem("top10", JSON.stringify(top10));
-      window.location.href = "http://127.0.0.1:3000/leaderboard.html";
+      window.location.href = "/leaderboard.html";
   })
 }
 
@@ -517,7 +520,7 @@ function review() {
     code: localStorage.getItem("code")
   };
 
-  fetch("http://127.0.0.1:3000/review", {
+  fetch("/review", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -527,7 +530,7 @@ function review() {
   .then(res => res.json())
   .then(data => {
     localStorage.setItem("Review", JSON.stringify(data));
-    window.location.href = "http://127.0.0.1:3000/review.html"
+    window.location.href = "/review.html"
   })
 }
 

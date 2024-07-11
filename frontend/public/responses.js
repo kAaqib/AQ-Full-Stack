@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     
     if (quizCode) {
         try {
-            const response = await fetch(`http://127.0.0.1:3000/responsesData?quizCode=${quizCode}`);
+            const response = await fetch(`/responsesData?quizCode=${quizCode}`);
             const jsonResponse = await response.json();
 
             if (jsonResponse.error) {

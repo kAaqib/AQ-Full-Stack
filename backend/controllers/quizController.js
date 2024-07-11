@@ -173,8 +173,6 @@ exports.getReview = async (req, res) => {
     if (code.includes('"')) {
         code = code.slice(1,4);
     }
-    console.log(username);
-    console.log(code);
     try {
         const user = await Answered.findOne({ username: username});
         let ans = user.answered.filter(arr => arr.code === code);
