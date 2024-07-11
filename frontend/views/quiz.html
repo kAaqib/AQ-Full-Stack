@@ -63,10 +63,10 @@
                     <div style="--i:4" class="line"></div>
                     <a href="home.html">Home</a>
                 </li>
-                <li>
+                <!-- <li>
                     <div style="--i:4" class="line"></div>
                     <a href="about.html">About</a>
-                </li>
+                </li> -->
                 <!-- <li>
                     <div style="--i:7.5" class="line"></div>
                     <a href="leader()" >Leaderboard</a>
@@ -78,6 +78,7 @@
         <div class="box" id="quiz">
             <div id="beforesub" style="display: block">
                 <div class="quiz-header">
+                    <h1 id="qnoview"></h1>
                     <h2 id="question">Question text</h2>
                     <ul>
                         <li>
@@ -102,10 +103,13 @@
             </div>
             <div id="aftersub" class="aftersub" style="display: none">
                 <h2 style="margin-top: 150px"><h2 id="res"></h2><br><br>
-                    <a href="selopt.html">
-                        <button class="btn" style="float: left; margin-left: 70px">Play again</button>
-                    </a>
-                    <button id="leaderboard" class="btn" style="float: right; margin-right: 70px;">Leaderboard</button>
+                    <div class="selbuts">    
+                        <button id="review" class="btn">Review</button>
+                        <a href="selopt.html">
+                            <button class="btn">Play again</button>
+                        </a>
+                        <button id="leaderboard" class="btn">Leaderboard</button>
+                    </div>
                 </h2>
             </div>
         </div>

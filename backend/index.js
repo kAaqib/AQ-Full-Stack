@@ -1,4 +1,3 @@
-console.log("This is the backend");
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
@@ -8,6 +7,17 @@ const path = require('path');
 const helmet = require('helmet');
 const quizRoutes = require('./routes/quizRoutes');
 const userRoutes = require('./routes/userRoutes');
+const pino = require('pino')
+const pinoPretty = require('pino-pretty');
+
+const logger = pino({
+    transport: {
+        target: 'pino/file',
+        options: { destination: `${__dirname}/app.log` },
+    },
+});
+
+app.use(require('pino-http')({ logger }));
 
 mongoose.connect("mongodb+srv://fccdb:fccdb@cluster0.teunbos.mongodb.net/ApnaQuiz?retryWrites=true&w=majority&appName=Cluster0");
 
@@ -22,8 +32,8 @@ app.use(
     helmet.contentSecurityPolicy({
         directives: {
             defaultSrc: ["'self'"],
-            fontSrc: ["'self'", "https://fonts.gstatic.com"],
             scriptSrc: ["'self'"],
+            styleSrc: ["'self'", "'unsafe-inline'"]
         },
     })
 );
@@ -68,8 +78,20 @@ app.get("/myquizzes.html", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend/views/myquizzes.html"));
 });
 
+app.get("/myanswers.html", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend/views/myanswers.html"));
+});
+
 app.get("/responses", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend/views/quizresponses.html"));
+})
+
+app.get("/review.html", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend/views/review.html"));
+})
+
+app.get("/deletequiz", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend/views/myquizzes.html"));
 })
 
 app.get("/delete", async function(req, res) {
