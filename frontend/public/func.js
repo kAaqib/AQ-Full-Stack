@@ -1,7 +1,3 @@
-const baseUrl = window.location.hostname.includes('repl.co') 
-    ? `https://${window.location.hostname}`
-    : 'http://127.0.0.1:3000';
-
 const username = document.getElementById("username");
 const password = document.getElementById("password");
 const logsub = document.getElementById("logsub");
