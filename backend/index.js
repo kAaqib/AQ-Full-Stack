@@ -9,7 +9,6 @@ const quizRoutes = require('./routes/quizRoutes');
 const userRoutes = require('./routes/userRoutes');
 const draftRoutes = require('./routes/draftRoutes');
 const pino = require('pino')
-const pinoPretty = require('pino-pretty');
 
 const Quiz = require('./models/quizModel');
 const Login = require('./models/loginModel');
@@ -20,8 +19,6 @@ const logger = pino({
         options: { destination: `${__dirname}/app.log` },
     },
 });
-
-app.use(require('pino-http')({ logger }));
 
 mongoose.connect("mongodb+srv://fccdb:fccdb@cluster0.teunbos.mongodb.net/ApnaQuiz?retryWrites=true&w=majority&appName=Cluster0");
 
@@ -41,6 +38,7 @@ app.use(
         },
     })
 );
+app.use(require('pino-http')({ logger }));
 
 app.get("/", function(req, res) {
     res.sendFile(path.join(__dirname, "../frontend/views/index.html"));

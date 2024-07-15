@@ -7,4 +7,5 @@ router.post('/mydrafts', getMyDrafts);
 router.post('/viewDquiz', getViewDQuiz);
 router.post('/editDquiz', getEditDQuiz);
 router.delete('/deleteDquizData', deleteDQuiz);
+
 module.exports = router;
