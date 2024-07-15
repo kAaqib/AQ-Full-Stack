@@ -49,7 +49,7 @@ exports.getMyDrafts = async (req, res) => {
             res.status(404).json({ error: 'User not found' });
         }
     } catch (err) {
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ error: 'User does not exist' });
     }
 }
 
@@ -62,7 +62,7 @@ exports.getViewDQuiz = async (req, res) => {
         const quiz = await Draft.findOne({ code: code });
         res.json(quiz.questions);
     } catch (error) {
-        res.status(500).json({error: 'Server error'});
+        res.status(500).json({error: 'No drafts with this code'});
     }
 }
 
@@ -72,7 +72,7 @@ exports.getEditDQuiz = async (req, res) => {
         const quiz = await Draft.findOne({ code: code });
         res.json({ code: code, questions: quiz.questions });
     } catch (error) {
-        res.status(500).json({ error: 'Server error' });
+        res.status(500).json({ error: 'No drafts with this code' });
     }
 }
 
@@ -86,6 +86,6 @@ exports.deleteDQuiz = async (req, res) => {
         user.save();
         res.json(user.mydrafts);
     } catch (error) {
-        res.status(500).json({error: 'Server error'});
+        res.status(500).json({error: 'No drafts with this code'});
     }
 }

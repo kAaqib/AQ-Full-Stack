@@ -24,23 +24,29 @@ exports.registerUser = async (req, res) => {
         } catch (error) {
             res.status(500).json({ error: 'Server error' });
         }
+    } else {
+        res.json({error: "Empty username & password"});
     }
 };
 
 exports.validateUser = async (req, res) => {
     const { username, password } = req.body;
-    try {
-        const user = await Login.findOne({ username: username });
-        if (!user) {
-            return res.json({ err: "User does not exist" });
+    if (username && password !== "") {
+        try {
+            const user = await Login.findOne({ username: username });
+            if (!user) {
+                return res.json({ err: "User does not exist" });
+            }
+            const isMatch = await bcrypt.compare(password, user.password);
+            if (isMatch) {
+                res.json({ msg: "Success"});
+            } else {
+                res.json({ err: "Invalid Credentials" });
+            }
+        } catch (error) {
+            res.status(500).json({ error: 'Server error' });
         }
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (isMatch) {
-            res.json({ msg: "Success"});
-        } else {
-            res.json({ err: "Invalid Credentials" });
-        }
-    } catch (error) {
-        res.status(500).json({ error: 'Server error' });
+    } else {
+        res.json({error: "Empty username & password"});
     }
 };

@@ -1,6 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM content loaded');
-
     // Event delegation for delete buttons
     document.getElementById('myquiztb').addEventListener('click', async function(event) {
         if (event.target.classList.contains('delete-quiz')) {

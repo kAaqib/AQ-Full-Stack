@@ -24,7 +24,6 @@ if(username) {
 
             if (response.ok) {
                 const result = await response.json();
-                console.log('Response:', result);
                 // Handle success - redirect or update the UI as needed
                 if (result.msg === "Success") {
                     // Assuming result.success indicates a successful login
@@ -63,7 +62,6 @@ if (regsub) {
             if (response.ok) {
                 // If the response is a redirect (successful registration), we manually follow the redirect
                 const result = await response.json();
-                console.log('Respose:', result);
                 if (result.msg === "Success") {
                   window.location.href = '/';
                 } else {
@@ -205,7 +203,6 @@ const res = document.getElementById("res");
 
 if (quiz) {
     if (localStorage.getItem("Received") == undefined) {
-        console.log("Doesnt exist")
         alert("Quiz does not exist");
     }
     let arr = JSON.parse(localStorage.getItem("Received"));
@@ -375,14 +372,39 @@ if (tryQ) {
 
 const addQ = document.getElementById("addQ");
 const subMake = document.getElementById("subMake");
+const draftbtn = document.getElementById("draftbtn");
+
+const checkCode = document.getElementById("quizCode");
+if (checkCode) {
+    checkCode.addEventListener("change", () =>  {
+        data = {
+            code: checkCode.value
+        }
+        fetch('/checkCode', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        })
+        .then (response => response.json())
+        .then (res => {
+            if (res.message === "Code exists") {
+                alert('Enter unique code: '+ res.message);
+                checkCode.value = "";
+            }
+        })
+    })
+}
 
 if (addQ) {
     let hidden = subMake.getAttribute("hidden");
+    let hid = draftbtn.getAttribute("hidden");
     let qcount = 0;
     addQ.addEventListener("click", () => {
         subMake.removeAttribute(hidden);
+        draftbtn.removeAttribute(hid);
         qcount++;
-        console.log(qcount);
         const qele = `
             <div class="question-block" id="question${qcount}">
                 <h3>Question ${qcount}</h3>
@@ -404,11 +426,10 @@ if (addQ) {
         document.getElementById('dnav').insertAdjacentHTML('beforeend', dele);
         document.getElementById(`del${qcount}`).addEventListener('click', function(event) {
             const id = this.getAttribute('data-id');
-            qcount = deleteQuestion(id, qcount, hidden);
+            qcount = deleteQuestion(id, qcount);
         });
     })
-    function deleteQuestion(id, qcount, hidden) {
-        console.log(id);
+    function deleteQuestion(id, qcount) {
         const questionBlock = document.getElementById(`question${id}`);
         
         // Remove the question block
@@ -424,12 +445,12 @@ if (addQ) {
         qcount--;
         if (qcount == 0) {
             subMake.setAttribute("hidden", "hidden");
+            draftbtn.setAttribute("hidden", "hidden");
         }
     
         // Update the remaining questions
         const remaining = document.querySelectorAll('.question-block');
-        const remdel = document.querySelector('.dnav').querySelectorAll('.dnavbtn');;
-        console.log(remdel);
+        const remdel = document.querySelector('.dnav').querySelectorAll('.dnavbtn');
         remdel.forEach((button, index) => {
             if (index >= id - 1) {
                 const newIndex = index + 1;
@@ -472,7 +493,8 @@ if (addQ) {
         return qcount;
     }
     
-    document.getElementById('quizForm').addEventListener('submit', function(event) {
+    document.getElementById('quizForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
         let un = document.getElementById("uname");
         if (!un) {
             // Retrieve the username from localStorage
@@ -496,6 +518,36 @@ if (addQ) {
             this.appendChild(usernameInput);
             this.appendChild(editflagInput);
         }
+        const form = event.target;
+        const formData = new FormData(form);
+
+        try {
+            const response = await fetch(form.action, {
+                method: form.method,
+                body: new URLSearchParams(formData), // Convert formData to URL-encoded format
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                // Handle success - redirect or update the UI as needed
+                if (result.message === 'Quiz saved successfully!') {
+                    // Assuming result.success indicates a successful login
+                    window.location.href = '/myquizzes.html'; // Redirect to home page
+                } else {
+                    // Show error message to the user
+                    alert('Operation failed: ' + result.message);
+                }
+            } else {
+                console.error('Error:', response.statusText);
+                alert('Error: ' + response.statusText);
+            }
+        } catch (error) {
+            console.error('Fetch error:', error);
+            alert('Fetch error: ' + error.message);
+        }
     });
 }
 
@@ -510,11 +562,12 @@ if (qcode) {
 }
 
 function updateLeaderboard(data) {
-    console.log("Updating ldb");
     data.forEach((entry, index) => {
+        var s = new Date(entry.lastanswered).toLocaleString('en-GB', {timeZone: 'Asia/Kolkata'});
         // Update the name and score cells
         document.getElementById(`name${index + 1}`).innerHTML = entry.username;
         document.getElementById(`score${index + 1}`).innerHTML = entry.score;
+        document.getElementById(`ansdon${index + 1}`).innerHTML = s;
     });
 }
 
