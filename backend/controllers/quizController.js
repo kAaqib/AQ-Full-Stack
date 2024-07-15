@@ -20,11 +20,15 @@ exports.getQuiz = async (req, res) => {
 
 exports.checkCode = async (req, res) => {
     const code = req.body.code;
-    let quiz = await Quiz.findOne({code: code});
-    if (quiz) {
-        res.json({message: "Code exists"});
+    if (/[a-zA-Z]/.test(code)) {
+        let quiz = await Quiz.findOne({code: code});
+        if (quiz) {
+            res.json({message: "Code exists"});
+        } else {
+            res.json({message: "lesgooo"});
+        }
     } else {
-        res.json({message: "lesgooo"});
+        res.json({message: "Code should contain alphabets"});
     }
 }
 

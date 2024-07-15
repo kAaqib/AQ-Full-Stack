@@ -389,8 +389,8 @@ if (checkCode) {
         })
         .then (response => response.json())
         .then (res => {
-            if (res.message === "Code exists") {
-                alert('Enter unique code: '+ res.message);
+            if (res.message !== "lesgooo") {
+                alert(res.message);
                 checkCode.value = "";
             }
         })
