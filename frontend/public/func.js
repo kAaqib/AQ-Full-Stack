@@ -468,6 +468,7 @@ if (myquiztb) {
           const tbody = document.getElementById('myquiztb');
           
           myquizzes.forEach((quiz, index) => {
+              var s = new Date(quiz.lastupdate).toLocaleString('en-GB', {timeZone: 'Asia/Kolkata'});
               const row = document.createElement('tr');
               row.innerHTML = `
               <td>${index + 1}</td>
@@ -476,7 +477,7 @@ if (myquiztb) {
               <td><button class="view-quiz btn" data-quiz-code="${quiz.code}" data-uname="${uname}">View Quiz</button></td>
               <td><button class="edit-quiz btn" data-quiz-code="${quiz.code}" data-uname="${uname}">Edit Quiz</button></td>
               <td><button class="delete-quiz btn" data-quiz-code="${quiz.code}" data-uname="${uname}">Delete</button></td>
-              <td>${quiz.lastupdate}</td>
+              <td>${s}</td>
               `;
               tbody.appendChild(row);
           });
@@ -505,14 +506,15 @@ if (mydrafttb) {
           const tbody = document.getElementById('mydrafttb');
           
           mydrafts.forEach((quiz, index) => {
+              var s = new Date(quiz.lastupdate).toLocaleString('en-GB', {timeZone: 'Asia/Kolkata'});
               const row = document.createElement('tr');
               row.innerHTML = `
-              <td>${index + 1}</td>
-              <td>${quiz.code}</td>
-              <td><button class="view-quiz btn" data-quiz-code="${quiz.code}" data-uname="${uname}">View Quiz</button></td>
-              <td><button class="edit-quiz btn" data-quiz-code="${quiz.code}" data-uname="${uname}">Edit Quiz</button></td>
-              <td><button class="delete-quiz btn" data-quiz-code="${quiz.code}" data-uname="${uname}">Delete</button></td>
-              <td>${quiz.lastupdate}</td>
+                <td>${index + 1}</td>
+                <td>${quiz.code}</td>
+                <td><button class="view-quiz btn" data-quiz-code="${quiz.code}" data-uname="${uname}">View Quiz</button></td>
+                <td><button class="edit-quiz btn" data-quiz-code="${quiz.code}" data-uname="${uname}">Edit Quiz</button></td>
+                <td><button class="delete-quiz btn" data-quiz-code="${quiz.code}" data-uname="${uname}">Delete</button></td>
+                <td>${s}</td>
               `;
               tbody.appendChild(row);
           });
@@ -540,12 +542,14 @@ if (myanstb) {
       .then (myanswers => {
           const anstbody = document.getElementById('myanstb');
           myanswers.forEach((ind, index) => {
+              var s = new Date(ind.date).toLocaleString('en-GB', {timeZone: 'Asia/Kolkata'});
               const row = document.createElement('tr');
               row.innerHTML = `
               <td>${(index + 1)}</td>
               <td>${ind.code}</td>
               <td><a href="/responses?quizCode=${ind.code}">${ind.score}</a></td>
               <td><button class="review-quiz btn" data-quiz-code="${ind.code}" data-uname="${uname}">Review</button></td>
+              <td>${s}</td>
               `;
               anstbody.appendChild(row);
           });
@@ -735,9 +739,11 @@ if (addQ && editflag == "true") {
   }
 }
 
-document.getElementById("draftbtn").addEventListener("click", () => {
-  const qf = document.getElementById("quizForm");
-  qf.setAttribute("action", "/savedraft");
-  subMake.click();
-  qf.setAttribute("action", "/saveQuiz");
-})
+if (addQ) {
+  document.getElementById("draftbtn").addEventListener("click", () => {
+    const qf = document.getElementById("quizForm");
+    qf.setAttribute("action", "/savedraft");
+    subMake.click();
+    qf.setAttribute("action", "/saveQuiz");
+  })
+}
