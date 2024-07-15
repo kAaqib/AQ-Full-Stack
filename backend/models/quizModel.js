@@ -11,13 +11,15 @@ const QuestionSchema = new mongoose.Schema({
 
 const ScoreSchema = new mongoose.Schema({
     username: String,
-    score: Number
+    score: Number,
+    lastanswered: Date
 });
 
 const QuizSchema = new mongoose.Schema({
     code: { type: String, unique: true },
     questions: [QuestionSchema],
-    scores: [ScoreSchema]
+    scores: [ScoreSchema],
+    lastupdate: Date
 });
 
 module.exports = mongoose.model('Quiz', QuizSchema);

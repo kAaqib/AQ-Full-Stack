@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <td>${index + 1}</td>
                     <td>${scoreData.username}</td>
                     <td>${scoreData.score}</td>
+                    <td><button class="review-quiz btn" data-quiz-code="${quizCode}" data-uname="${scoreData.username}">Review</button></td>
                 `;
                 tbody.appendChild(row);
             });

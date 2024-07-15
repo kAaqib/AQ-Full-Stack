@@ -1,4 +1,5 @@
 const Quiz = require('../models/quizModel');
+const Draft = require('../models/draftModel');
 const Login = require('../models/loginModel');
 const Answered = require('../models/answerModel');
 const transformFormData = require('../utils/transformFormData');
@@ -14,23 +15,60 @@ exports.getQuiz = async (req, res) => {
 };
 
 exports.saveQuiz = async (req, res) => {
+    let date = Date();
     const transformedData = transformFormData(req.body);
     const username = transformedData.username;
     const quizCode = transformedData.quizCode;
     const questions = transformedData.questions;
-
-    const user = await Login.findOne({username: username});
-    user.myquizzes.push(quizCode);
-    await user.save();
-
-    const newQuiz = new Quiz({
+    const editflag = transformedData.editflag;
+    await Draft.deleteOne({code: quizCode});
+    const quiz = await Quiz.findOne({code: quizCode});
+    let quizCodenDate = {
         code: quizCode,
-        questions: Object.values(questions)
-    });
-
-    newQuiz.save()
+        lastupdate: date
+    }
+    if (editflag == "false" && !quiz) {
+        const user = await Login.findOne({username: username});
+        user.mydrafts = user.mydrafts.filter(arr => arr.code!==quizCode);
+        user.myquizzes.push(quizCodenDate);
+        await user.save();
+        
+        const newQuiz = new Quiz({
+            code: quizCode,
+            questions: Object.values(questions)
+        });
+        
+        newQuiz.save()
         .then(() => res.status(201).json({ message: 'Quiz saved successfully!', Code: quizCode }))
         .catch(error => res.status(500).json({ message: 'Internal server error' }));
+    } else if (editflag == "true") {
+        let user = await Login.findOne({username: username});
+        user.mydrafts = user.mydrafts.filter(arr => arr.code!==quizCode);
+        user.myquizzes = user.myquizzes.filter(quiz => quiz.code !== quizCode);
+        user.myquizzes.push(quizCodenDate);
+        await user.save();
+        
+        let quiz = await Quiz.findOne({code: quizCode});
+        if (quiz) {
+            quiz.questions = Object.values(questions);
+            quiz.lastupdate = date;
+            quiz.save()
+            .then(() => res.status(201).json({ message: 'Quiz saved successfully!', Code: quizCode }))
+            .catch(error => res.status(500).json({ message: 'Internal server error' }));
+        } else {
+            const newQuiz = new Quiz({
+                code: quizCode,
+                questions: Object.values(questions)
+            });
+            
+            newQuiz.save()
+            .then(() => res.status(201).json({ message: 'Quiz saved successfully!', Code: quizCode }))
+            .catch(error => res.status(500).json({ message: 'Internal server error' }));
+        }
+        
+    } else {
+        res.json({message: "Code already exists"});
+    }
 };
 
 exports.getScore = async (req, res) => {
@@ -171,7 +209,7 @@ exports.getReview = async (req, res) => {
     const username = req.body.name;
     let code = req.body.code;
     if (code.includes('"')) {
-        code = code.slice(1,4);
+        code = code.slice(1, code.length-1);
     }
     try {
         const user = await Answered.findOne({ username: username});
@@ -179,5 +217,28 @@ exports.getReview = async (req, res) => {
         res.json(ans[0].qna);
     } catch (error) {
         res.status(500).json({error: 'Server error'});
+    }
+}
+
+exports.getViewQuiz = async (req, res) => {
+    let code = req.body.code;
+    if (code.includes('"')) {
+        code = code.slice(1, code.length-1);
+    }
+    try {
+        const quiz = await Quiz.findOne({ code: code });
+        res.json(quiz.questions);
+    } catch (error) {
+        res.status(500).json({error: 'Server error'});
+    }
+}
+
+exports.getEditQuiz = async (req, res) => {
+    let code = req.body.code;
+    try {
+        const quiz = await Quiz.findOne({ code: code });
+        res.json({ code: code, questions: quiz.questions });
+    } catch (error) {
+        res.status(500).json({ error: 'Server error' });
     }
 }

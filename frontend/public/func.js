@@ -8,6 +8,19 @@ if(username) {
     })  
 }
 
+const startbtn = document.getElementById("startbtn");
+if (startbtn) {
+  localStorage.setItem("code", "");
+  localStorage.setItem("top10", "");
+  localStorage.setItem("EditFlag", "false");
+  localStorage.setItem("Received", "");
+  localStorage.setItem("Edit", "");
+  localStorage.setItem("Review", "");
+  localStorage.setItem("topic", "");
+  localStorage.setItem("level", "");
+  localStorage.setItem("View", "");
+}
+
 const topicEls = document.querySelectorAll(".topic");
 const levelEls = document.querySelectorAll(".level");
 const selbtn = document.getElementById("selbtn");
@@ -347,8 +360,6 @@ if (addQ) {
         console.log(remdel);
         remdel.forEach((button, index) => {
             if (index >= id - 1) {
-                console.log(button);
-                console.log(index)
                 const newIndex = index + 1;
                 button.id = `del${newIndex}`;
                 button.dataset.id = newIndex;
@@ -390,17 +401,32 @@ if (addQ) {
     }
     
     document.getElementById('quizForm').addEventListener('submit', function(event) {
-        // Retrieve the username from localStorage
-        const username = localStorage.getItem('myName');
-    
-        // Create a hidden input field for the username
-        const usernameInput = document.createElement('input');
-        usernameInput.type = 'hidden';
-        usernameInput.name = 'username';  // Set the name for the form field
-        usernameInput.value = username;   // Set the value to the retrieved username
-    
-        // Append the hidden input field to the form
-        this.appendChild(usernameInput);
+      let un = document.getElementById("uname");
+
+        if (!un) {
+
+          
+          // Retrieve the username from localStorage
+          const username = localStorage.getItem('myName');
+          const EditFlag = localStorage.getItem('EditFlag');
+          localStorage.setItem("EditFlag", "false");
+          // Create a hidden input field for the username
+          const usernameInput = document.createElement('input');
+          usernameInput.type = 'hidden';
+          usernameInput.id = 'uname';  // Set the name for the form field
+          usernameInput.name = 'username';  // Set the name for the form field
+          usernameInput.value = username;   // Set the value to the retrieved username
+          
+          const editflagInput = document.createElement('input');
+          editflagInput.type = 'hidden';
+          editflagInput.id = 'editflag';  // Set the name for the form field
+          editflagInput.name = 'editflag';  // Set the name for the form field
+          editflagInput.value = EditFlag;   // Set the value to the retrieved username
+          
+          // Append the hidden input field to the form
+          this.appendChild(usernameInput);
+          this.appendChild(editflagInput);
+        }
     });
 }
 
@@ -441,13 +467,52 @@ if (myquiztb) {
       .then (myquizzes => {
           const tbody = document.getElementById('myquiztb');
           
-          myquizzes.forEach((quizCode, index) => {
+          myquizzes.forEach((quiz, index) => {
               const row = document.createElement('tr');
               row.innerHTML = `
               <td>${index + 1}</td>
-              <td>${quizCode}</td>
-              <td><a href="/responses?quizCode=${quizCode}">View Responses</a></td>
-              <td><button class="delete-quiz btn" data-quiz-code="${quizCode}" data-uname="${uname}">Delete</button></td>
+              <td>${quiz.code}</td>
+              <td><a href="/responses?quizCode=${quiz.code}">View Responses</a></td>
+              <td><button class="view-quiz btn" data-quiz-code="${quiz.code}" data-uname="${uname}">View Quiz</button></td>
+              <td><button class="edit-quiz btn" data-quiz-code="${quiz.code}" data-uname="${uname}">Edit Quiz</button></td>
+              <td><button class="delete-quiz btn" data-quiz-code="${quiz.code}" data-uname="${uname}">Delete</button></td>
+              <td>${quiz.lastupdate}</td>
+              `;
+              tbody.appendChild(row);
+          });
+      })
+  } catch (err) {
+      console.error('Error fetching quizzes:', err);
+  }
+};
+
+const mydrafttb = document.getElementById("mydrafttb");
+if (mydrafttb) {
+  try {
+      const uname = localStorage.getItem("myName");
+      const data = {
+          username: uname
+      };
+      fetch('/mydrafts', {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json"
+          },
+          body: JSON.stringify(data)
+      })
+      .then (response => response.json())
+      .then (mydrafts => {
+          const tbody = document.getElementById('mydrafttb');
+          
+          mydrafts.forEach((quiz, index) => {
+              const row = document.createElement('tr');
+              row.innerHTML = `
+              <td>${index + 1}</td>
+              <td>${quiz.code}</td>
+              <td><button class="view-quiz btn" data-quiz-code="${quiz.code}" data-uname="${uname}">View Quiz</button></td>
+              <td><button class="edit-quiz btn" data-quiz-code="${quiz.code}" data-uname="${uname}">Edit Quiz</button></td>
+              <td><button class="delete-quiz btn" data-quiz-code="${quiz.code}" data-uname="${uname}">Delete</button></td>
+              <td>${quiz.lastupdate}</td>
               `;
               tbody.appendChild(row);
           });
@@ -591,3 +656,88 @@ if (quizreview) {
     });
   });
 }
+
+const viewquiz = document.getElementById("viewquiz");
+
+if (viewquiz) {
+  let arr = JSON.parse(localStorage.getItem("View"));
+  let quizData = arr;
+
+  let qno = 0;
+
+  loadQuiz();
+  function loadQuiz() {
+    if (qno === quizData.length - 1)
+      submitBtn.innerHTML = "Exit";
+    else
+      submitBtn.innerHTML = "Next";
+    const CurrData = quizData[qno];
+    qnoview.innerText = "Question " + (qno + 1);
+    questionEl.innerText = CurrData.question;
+    a_text.innerText = CurrData.a;
+    b_text.innerText = CurrData.b;
+    d_text.innerText = CurrData.d;
+    c_text.innerText = CurrData.c;
+    ans.innerText = CurrData.ans;
+  }
+
+  submitBtn.addEventListener("click", async () => {
+      const currentButton = document.getElementById(`q${qno + 1}`);
+      if (currentButton) {
+        currentButton.style.backgroundColor = "#5e174e";
+      }
+      qno++;
+      if (qno < quizData.length) { 
+        loadQuiz();
+      } else {
+        submitQuiz();
+      }
+  });
+
+  function submitQuiz() {
+    window.location.href = "home.html"
+  }
+  
+  for (let i=1; i<=quizData.length; i++) {
+    const qbut = `<button class="qnavbtn" id="q${i}">${i}</button>`
+    document.querySelector('.qnav').insertAdjacentHTML('beforeend', qbut);
+  }
+  
+  document.querySelectorAll('.qnavbtn').forEach(button => {
+    button.addEventListener('click', function() {
+      qno = parseInt(this.id.replace('q', '')) - 1;
+      loadQuiz();
+    });
+  });
+}
+
+const editflag = localStorage.getItem("EditFlag");
+const quizcip = document.getElementById("quizCode");
+
+if (addQ && editflag == "true") {
+  const edit = JSON.parse(localStorage.getItem("Edit"));
+  quizcip.value = edit.code;
+  quizcip.setAttribute("readonly", "readonly");
+  for (let i=0; i<edit.questions.length; i++) {
+    addQ.click();
+    const qt = document.getElementById(`questionText${(i+1)}`);
+    const opA = document.getElementById(`optionA${(i+1)}`);
+    const opB = document.getElementById(`optionB${(i+1)}`);
+    const opC = document.getElementById(`optionC${(i+1)}`);
+    const opD = document.getElementById(`optionD${(i+1)}`);
+    const qans = document.getElementById(`answer${(i+1)}`);
+    qt.value = edit.questions[i].question;
+    opA.value = edit.questions[i].a;
+    opB.value = edit.questions[i].b;
+    opC.value = edit.questions[i].c;
+    opD.value = edit.questions[i].d;
+    qans.value = edit.questions[i].ans;
+  }
+}
+
+document.getElementById("draftbtn").addEventListener("click", () => {
+  const qf = document.getElementById("quizForm");
+  qf.setAttribute("action", "/savedraft");
+  subMake.click();
+  qf.setAttribute("action", "/saveQuiz");
+})

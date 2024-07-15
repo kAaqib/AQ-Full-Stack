@@ -7,8 +7,12 @@ const path = require('path');
 const helmet = require('helmet');
 const quizRoutes = require('./routes/quizRoutes');
 const userRoutes = require('./routes/userRoutes');
+const draftRoutes = require('./routes/draftRoutes');
 const pino = require('pino')
 const pinoPretty = require('pino-pretty');
+
+const Quiz = require('./models/quizModel');
+const Login = require('./models/loginModel');
 
 const logger = pino({
     transport: {
@@ -90,17 +94,23 @@ app.get("/review.html", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend/views/review.html"));
 })
 
+app.get("/viewquiz.html", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend/views/viewquiz.html"));
+})
+
 app.get("/deletequiz", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend/views/myquizzes.html"));
 })
 
 app.get("/delete", async function(req, res) {
     await Login.deleteMany({});
+    await Quiz.deleteMany({});
     res.json({ status: "deleted" });
 });
 
 app.use(quizRoutes);
 app.use(userRoutes);
+app.use(draftRoutes);
 
 app.listen(3000, () => {
     console.log('Server is running on port 3000');
