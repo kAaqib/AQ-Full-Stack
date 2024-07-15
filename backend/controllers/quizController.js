@@ -8,7 +8,11 @@ exports.getQuiz = async (req, res) => {
     const code = req.body.code;
     try {
         const quiz = await Quiz.findOne({ code: code }).select('-questions.ans');
-        res.json({ code: code, questions: quiz.questions });
+        if (quiz) {
+            res.json({ code: code, questions: quiz.questions });
+        } else {
+            res.json({ msg: "Quiz does not exist"});
+        }
     } catch (error) {
         res.status(500).json({ error: 'Server error' });
     }

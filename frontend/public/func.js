@@ -1,11 +1,83 @@
 const username = document.getElementById("username");
 const password = document.getElementById("password");
 const logsub = document.getElementById("logsub");
+const regsub = document.getElementById("reggsub");
 
 if(username) {
     username.addEventListener("change", () => {
         localStorage.setItem("myName", username.value);
     })  
+  document.getElementById('loginForm').addEventListener('submit', async (event) => {
+    event.preventDefault(); // Prevent the default form submission
+
+    const form = event.target;
+    const formData = new FormData(form);
+
+    try {
+        const response = await fetch(form.action, {
+            method: form.method,
+            body: new URLSearchParams(formData), // Convert formData to URL-encoded format
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            console.log('Response:', result);
+            // Handle success - redirect or update the UI as needed
+            if (result.msg === "Success") {
+                // Assuming result.success indicates a successful login
+                window.location.href = '/home.html'; // Redirect to home page
+            } else {
+                // Show error message to the user
+                alert('Login failed: ' + result.err);
+            }
+        } else {
+            console.error('Error:', response.statusText);
+            alert('Error: ' + response.statusText);
+        }
+    } catch (error) {
+        console.error('Fetch error:', error);
+        alert('Fetch error: ' + error.message);
+    }
+  });
+}
+
+if (regsub) {
+  document.getElementById('regForm').addEventListener('submit', async (event) => {
+    event.preventDefault(); // Prevent the default form submission
+
+  const form = event.target;
+  const formData = new FormData(form);
+
+  try {
+      const response = await fetch("/register", {
+          method: "POST",
+          body: new URLSearchParams(formData), // Convert formData to URL-encoded format
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        });
+        
+        if (response.ok) {
+          // If the response is a redirect (successful registration), we manually follow the redirect
+          const result = await response.json();
+          console.log('Respose:', result);
+          if (result.msg === "Success") {
+            window.location.href = '/';
+          } else {
+            alert('Error: ' + result.msg);
+          }
+        } else {
+          console.error('Error:', response.statusText);
+          alert('Error: ' + response.statusText);
+        }
+    } catch (error) {
+        console.error('Fetch error:', error);
+        alert('Fetch error: ' + error.message);
+    }
+  });
 }
 
 const startbtn = document.getElementById("startbtn");
@@ -745,5 +817,12 @@ if (addQ) {
     qf.setAttribute("action", "/savedraft");
     subMake.click();
     qf.setAttribute("action", "/saveQuiz");
+  })
+}
+
+const logout = document.getElementById("logoutbtn");
+if (logout) {
+  logout.addEventListener("click", () => {
+    window.location.href = '/';
   })
 }
