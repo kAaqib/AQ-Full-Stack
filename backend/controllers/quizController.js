@@ -9,9 +9,9 @@ exports.getQuiz = async (req, res) => {
     try {
         const quiz = await Quiz.findOne({ code: code }).select('-questions.ans');
         if (quiz) {
-            res.json({ code: code, questions: quiz.questions });
+            res.status(200).json({ code: code, questions: quiz.questions });
         } else {
-            res.json({ msg: "Quiz does not exist"});
+            res.status(404).json({ msg: "Quiz does not exist" });
         }
     } catch (error) {
         res.status(500).json({ error: 'Server error' });
@@ -21,77 +21,81 @@ exports.getQuiz = async (req, res) => {
 exports.checkCode = async (req, res) => {
     const code = req.body.code;
     if (/[a-zA-Z]/.test(code)) {
-        let quiz = await Quiz.findOne({code: code});
-        if (quiz) {
-            res.json({message: "Code exists"});
-        } else {
-            res.json({message: "lesgooo"});
+        try {
+            let quiz = await Quiz.findOne({ code: code });
+            if (quiz) {
+                res.status(200).json({ message: "Code exists" });
+            } else {
+                res.status(200).json({ message: "lesgooo" });
+            }
+        } catch (error) {
+            res.status(500).json({ error: 'Server error' });
         }
     } else {
-        res.json({message: "Code should contain alphabets"});
+        res.status(400).json({ message: "Code should contain alphabets" });
     }
-}
+};
 
 exports.saveQuiz = async (req, res) => {
-    let date = Date();
+    let date = new Date();
     const transformedData = transformFormData(req.body);
     const username = transformedData.username;
     const quizCode = transformedData.quizCode;
     const questions = transformedData.questions;
     const editflag = transformedData.editflag;
-    await Draft.deleteOne({code: quizCode});
-    const quiz = await Quiz.findOne({code: quizCode});
+    await Draft.deleteOne({ code: quizCode });
+    const quiz = await Quiz.findOne({ code: quizCode });
     let quizCodenDate = {
         code: quizCode,
         lastupdate: date
-    }
-    if (editflag == "false" && !quiz) {
-        const user = await Login.findOne({username: username});
-        user.mydrafts = user.mydrafts.filter(arr => arr.code!==quizCode);
+    };
+    if (editflag === "false" && !quiz) {
+        const user = await Login.findOne({ username: username });
+        user.mydrafts = user.mydrafts.filter(arr => arr.code !== quizCode);
         user.myquizzes.push(quizCodenDate);
         await user.save();
-        
+
         const newQuiz = new Quiz({
             code: quizCode,
             questions: Object.values(questions)
         });
-        
+
         newQuiz.save()
-        .then(() => res.status(201).json({ message: 'Quiz saved successfully!', Code: quizCode }))
-        .catch(error => res.status(500).json({ message: 'Internal server error' }));
-    } else if (editflag == "true") {
-        let user = await Login.findOne({username: username});
-        user.mydrafts = user.mydrafts.filter(arr => arr.code!==quizCode);
+            .then(() => res.status(201).json({ message: 'Quiz saved successfully!', Code: quizCode }))
+            .catch(error => res.status(500).json({ message: 'Internal server error' }));
+    } else if (editflag === "true") {
+        const user = await Login.findOne({ username: username });
+        user.mydrafts = user.mydrafts.filter(arr => arr.code !== quizCode);
         user.myquizzes = user.myquizzes.filter(quiz => quiz.code !== quizCode);
         user.myquizzes.push(quizCodenDate);
         await user.save();
-        
-        let quiz = await Quiz.findOne({code: quizCode});
+
+        const quiz = await Quiz.findOne({ code: quizCode });
         if (quiz) {
             quiz.questions = Object.values(questions);
             quiz.lastupdate = date;
             quiz.save()
-            .then(() => res.status(201).json({ message: 'Quiz saved successfully!', Code: quizCode }))
-            .catch(error => res.status(500).json({ message: 'Internal server error' }));
+                .then(() => res.status(201).json({ message: 'Quiz saved successfully!', Code: quizCode }))
+                .catch(error => res.status(500).json({ message: 'Internal server error' }));
         } else {
             const newQuiz = new Quiz({
                 code: quizCode,
                 questions: Object.values(questions)
             });
-            
+
             newQuiz.save()
-            .then(() => res.status(201).json({ message: 'Quiz saved successfully!', Code: quizCode }))
-            .catch(error => res.status(500).json({ message: 'Internal server error' }));
+                .then(() => res.status(201).json({ message: 'Quiz saved successfully!', Code: quizCode }))
+                .catch(error => res.status(500).json({ message: 'Internal server error' }));
         }
-        
+
     } else {
-        res.json({message: "Code already exists"});
+        res.status(400).json({ message: "Code already exists" });
     }
 };
 
 exports.getScore = async (req, res) => {
-    let date = Date();
-    let answers = req.body;
+    let date = new Date();
+    const answers = req.body;
     let qc = answers["code"];
     if (qc.includes('"')) {
         qc = qc.substring(1, answers["code"].length - 1);
@@ -122,30 +126,31 @@ exports.getScore = async (req, res) => {
                 score++;
             }
         });
+
         let answereds = {
             code: qc,
             qna: qna,
             score: score,
-            date: Date()
-        }
+            date: date
+        };
 
-        const data = { username: name, score: score, lastanswered: date};
+        const data = { username: name, score: score, lastanswered: date };
         qid.scores.push(data);
         await qid.save();
 
-        const user = await Answered.findOne({username: name});
+        const user = await Answered.findOne({ username: name });
         if (!user) {
-            const ansdata = new Answered({ 
+            const ansdata = new Answered({
                 username: name,
                 answered: answereds
             });
-            ansdata.save();
+            await ansdata.save();
         } else {
-            user.answered = user.answered.filter(arr => arr.code !== qc)
+            user.answered = user.answered.filter(arr => arr.code !== qc);
             user.answered.push(answereds);
-            user.save();
+            await user.save();
         }
-        res.json({ score: score });
+        res.status(200).json({ score: score });
     } catch (error) {
         res.status(500).json({ error: 'Server error' });
     }
@@ -162,7 +167,7 @@ exports.getTopScores = async (req, res) => {
             return res.status(404).json({ error: 'Quiz not found' });
         }
         let topScores = quiz.scores.sort((a, b) => b.score - a.score).slice(0, 10);
-        res.json({ "Top10": topScores });
+        res.status(200).json({ "Top10": topScores });
     } catch (error) {
         res.status(500).json({ error: 'Server error' });
     }
@@ -173,28 +178,28 @@ exports.getMyQuizzes = async (req, res) => {
     try {
         const user = await Login.findOne({ username: username });
         if (user) {
-            res.json(user.myquizzes);
+            res.status(200).json(user.myquizzes);
         } else {
             res.status(404).json({ error: 'User not found' });
         }
     } catch (err) {
         res.status(500).json({ error: 'Internal server error' });
     }
-}
+};
 
 exports.getMyAnswers = async (req, res) => {
     const username = req.body.username;
     try {
         const user = await Answered.findOne({ username: username });
         if (user) {
-            res.json(user.answered);
+            res.status(200).json(user.answered);
         } else {
-            res.json({ message: "You have not attempted any quizzes"});
+            res.status(404).json({ message: "You have not attempted any quizzes" });
         }
     } catch (err) {
         res.status(500).json({ error: 'Internal server error' });
     }
-}
+};
 
 exports.getResponses = async (req, res) => {
     const quizCode = req.query.quizCode;
@@ -204,11 +209,11 @@ exports.getResponses = async (req, res) => {
         if (!quiz) {
             return res.status(404).json({ error: 'Quiz not found' });
         }
-        res.json({ "Scores": quiz.scores });
+        res.status(200).json({ "Scores": quiz.scores });
     } catch (error) {
         res.status(500).json({ error: 'Server error' });
     }
-}
+};
 
 exports.deleteQuiz = async (req, res) => {
     const quizCode = req.query.quizCode;
@@ -216,56 +221,68 @@ exports.deleteQuiz = async (req, res) => {
     if (uname !== "" && quizCode !== "") {
         try {
             await Quiz.deleteOne({ code: quizCode });
-            const user = await Login.findOne({ username: uname});
+            const user = await Login.findOne({ username: uname });
             if (user) {
                 user.myquizzes = user.myquizzes.filter(obj => obj.code !== quizCode);
                 await user.save();
-                res.json(user.myquizzes);
+                res.status(200).json(user.myquizzes);
             } else {
-                res.json({error: "User does not exist"});
+                res.status(404).json({ error: "User not found" });
             }
         } catch (error) {
-            res.status(500).json({error: 'Quiz does not exist'});
+            res.status(500).json({ error: 'Quiz not found' });
         }
     } else {
-        res.json({error: "Quiz code cannot be empty"});
+        res.status(400).json({ error: "Quiz code cannot be empty" });
     }
-}
+};
 
 exports.getReview = async (req, res) => {
     const username = req.body.name;
     let code = req.body.code;
     if (code.includes('"')) {
-        code = code.slice(1, code.length-1);
+        code = code.slice(1, code.length - 1);
     }
     try {
-        const user = await Answered.findOne({ username: username});
-        let ans = user.answered.filter(arr => arr.code === code);
-        res.json(ans[0].qna);
+        const user = await Answered.findOne({ username: username });
+        if (user) {
+            let ans = user.answered.filter(arr => arr.code === code);
+            res.status(200).json(ans[0].qna);
+        } else {
+            res.status(404).json({ error: 'No answers found for this quiz' });
+        }
     } catch (error) {
-        res.status(500).json({error: 'Not attempted this quiz'});
+        res.status(500).json({ error: 'Server error' });
     }
-}
+};
 
 exports.getViewQuiz = async (req, res) => {
     let code = req.body.code;
     if (code.includes('"')) {
-        code = code.slice(1, code.length-1);
+        code = code.slice(1, code.length - 1);
     }
     try {
         const quiz = await Quiz.findOne({ code: code });
-        res.json(quiz.questions);
+        if (quiz) {
+            res.status(200).json(quiz.questions);
+        } else {
+            res.status(404).json({ error: 'Quiz not found' });
+        }
     } catch (error) {
-        res.status(500).json({error: 'Quiz does not exist'});
+        res.status(500).json({ error: 'Server error' });
     }
-}
+};
 
 exports.getEditQuiz = async (req, res) => {
     let code = req.body.code;
     try {
         const quiz = await Quiz.findOne({ code: code });
-        res.json({ code: code, questions: quiz.questions });
+        if (quiz) {
+            res.status(200).json({ code: code, questions: quiz.questions });
+        } else {
+            res.status(404).json({ error: 'Quiz not found' });
+        }
     } catch (error) {
-        res.status(500).json({ error: 'Quiz does not exist' });
+        res.status(500).json({ error: 'Server error' });
     }
-}
+};

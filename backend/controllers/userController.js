@@ -8,16 +8,17 @@ exports.registerUser = async (req, res) => {
         const unExists = await Login.findOne({ username: username });
         try {
             if (unExists) {
-                return res.json({ msg: "Username exists" });
+                return res.status(400).json({ msg: "Username exists" });
             } else {
                 bcrypt.genSalt(10, function (err, Salt) {
                     bcrypt.hash(password, Salt, async function (err, hash) {
                         if (err) {
-                            return console.log('Cannot encrypt');
+                            console.log('Cannot encrypt');
+                            return res.status(500).json({ error: 'Server error' });
                         }
                         const user = new Login({ username: username, password: hash });
                         await user.save();
-                        res.json({msg: "Success"});
+                        res.status(201).json({ msg: "Success" });
                     });
                 });
             }
@@ -25,7 +26,7 @@ exports.registerUser = async (req, res) => {
             res.status(500).json({ error: 'Server error' });
         }
     } else {
-        res.json({error: "Empty username & password"});
+        res.status(400).json({ error: "Empty username & password" });
     }
 };
 
@@ -35,18 +36,18 @@ exports.validateUser = async (req, res) => {
         try {
             const user = await Login.findOne({ username: username });
             if (!user) {
-                return res.json({ err: "User does not exist" });
+                return res.status(404).json({ err: "User does not exist" });
             }
             const isMatch = await bcrypt.compare(password, user.password);
             if (isMatch) {
-                res.json({ msg: "Success"});
+                res.status(200).json({ msg: "Success" });
             } else {
-                res.json({ err: "Invalid Credentials" });
+                res.status(401).json({ err: "Invalid Credentials" });
             }
         } catch (error) {
             res.status(500).json({ error: 'Server error' });
         }
     } else {
-        res.json({error: "Empty username & password"});
+        res.status(400).json({ error: "Empty username & password" });
     }
 };

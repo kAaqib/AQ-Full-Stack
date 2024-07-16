@@ -4,88 +4,108 @@ const Login = require("../models/loginModel");
 const transformFormData = require('../utils/transformFormData');
 
 exports.getSaveDraft = async (req, res) => {
-    let date = Date();
+    let date = new Date();
     const transformedData = transformFormData(req.body);
     const code = transformedData.quizCode;
     const uname = transformedData.username;
-    const user = await Login.findOne({username: uname});
-    let quizCodenDate = {
-        code: code,
-        lastupdate: date
-    }
-    if (user) {
-        user.myquizzes = user.myquizzes.filter(arr => arr.code !== transformedData.quizCode);
-        user.mydrafts.push(quizCodenDate);
-        user.save();
-    }
-    const dquiz = await Draft.findOne({code: code});
-    if (dquiz) {
-        dquiz.questions = Object.values(transformedData.questions);
-        dquiz.lastupdate = date;
-        dquiz.save()
-        .then(() => res.status(201).json({ message: 'Quiz saved successfully!', Code: quizCode }))
-    } else {
-        const newdquiz = new Draft({
-            username: transformedData.username,
+
+    try {
+        const user = await Login.findOne({ username: uname });
+        let quizCodenDate = {
             code: code,
-            questions: Object.values(transformedData.questions),
             lastupdate: date
-        });
-        newdquiz.save()
-        .then(async () => {
-            await Quiz.deleteOne({code: code});
-        })
-        .then(() => res.status(201).json({ message: 'Quiz saved successfully!', Code: code }))
+        };
+
+        if (user) {
+            user.myquizzes = user.myquizzes.filter(arr => arr.code !== code);
+            user.mydrafts.push(quizCodenDate);
+            await user.save();
+        } else {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const dquiz = await Draft.findOne({ code: code });
+
+        if (dquiz) {
+            dquiz.questions = Object.values(transformedData.questions);
+            dquiz.lastupdate = date;
+            await dquiz.save();
+            res.status(201).json({ message: 'Draft saved successfully!', Code: code });
+        } else {
+            const newdquiz = new Draft({
+                username: uname,
+                code: code,
+                questions: Object.values(transformedData.questions),
+                lastupdate: date
+            });
+            await newdquiz.save();
+            await Quiz.deleteOne({ code: code });
+            res.status(201).json({ message: 'Draft saved successfully!', Code: code });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Server error' });
     }
-}
+};
 
 exports.getMyDrafts = async (req, res) => {
     const username = req.body.username;
     try {
         const user = await Login.findOne({ username: username });
         if (user) {
-            res.json(user.mydrafts);
+            res.status(200).json(user.mydrafts);
         } else {
             res.status(404).json({ error: 'User not found' });
         }
     } catch (err) {
-        res.status(500).json({ error: 'User does not exist' });
+        res.status(500).json({ error: 'Server error' });
     }
-}
+};
 
 exports.getViewDQuiz = async (req, res) => {
     let code = req.body.code;
     if (code.includes('"')) {
-        code = code.slice(1, code.length-1);
+        code = code.slice(1, code.length - 1);
     }
     try {
         const quiz = await Draft.findOne({ code: code });
-        res.json(quiz.questions);
+        if (quiz) {
+            res.status(200).json(quiz.questions);
+        } else {
+            res.status(404).json({ error: 'No drafts with this code' });
+        }
     } catch (error) {
-        res.status(500).json({error: 'No drafts with this code'});
+        res.status(500).json({ error: 'Server error' });
     }
-}
+};
 
 exports.getEditDQuiz = async (req, res) => {
     let code = req.body.code;
     try {
         const quiz = await Draft.findOne({ code: code });
-        res.json({ code: code, questions: quiz.questions });
+        if (quiz) {
+            res.status(200).json({ code: code, questions: quiz.questions });
+        } else {
+            res.status(404).json({ error: 'No drafts with this code' });
+        }
     } catch (error) {
-        res.status(500).json({ error: 'No drafts with this code' });
+        res.status(500).json({ error: 'Server error' });
     }
-}
+};
 
 exports.deleteDQuiz = async (req, res) => {
     const quizCode = req.query.quizCode;
     const uname = req.query.uname;
     try {
         await Draft.deleteOne({ code: quizCode });
-        const user = await Login.findOne({ username: uname});
-        user.mydrafts = user.mydrafts.filter(arr => arr.code !== quizCode);
-        user.save();
-        res.json(user.mydrafts);
+        const user = await Login.findOne({ username: uname });
+        if (user) {
+            user.mydrafts = user.mydrafts.filter(arr => arr.code !== quizCode);
+            await user.save();
+            res.status(200).json(user.mydrafts);
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
     } catch (error) {
-        res.status(500).json({error: 'No drafts with this code'});
+        res.status(500).json({ error: 'Server error' });
     }
-}
+};
