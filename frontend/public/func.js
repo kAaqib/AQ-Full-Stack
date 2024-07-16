@@ -121,7 +121,6 @@ if (selbtn) {
     l3.addEventListener("click", () => {
         levelEls[2].checked = true;
     });
-    
     selbtn.addEventListener("click", ()=>{
         let topic;
         let level;
@@ -133,58 +132,58 @@ if (selbtn) {
             if (levelEls.checked)
                 level = levelEls.id;
         })
-        localStorage.setItem("topic", topic);
-        localStorage.setItem("level", level);
-
-        let code;
-
-        switch(topic) {
-            case 'General Knowledge':
-                switch(level) {
-                    case 'Level 1': code = 'gk1'; break;
-                    case 'Level 2': code = 'gk2'; break;
-                    case 'Level 3': code = 'gk3'; break;
-                }
-                break;
-            case 'Science':
-                switch(level) {
-                    case 'Level 1': code = 'sc1'; break;
-                    case 'Level 2': code = 'sc2'; break;
-                    case 'Level 3': code = 'sc3'; break;
-                }
-                break;
-            case 'Mathematics':
-                switch(level) {
-                    case 'Level 1': code = 'mt1'; break;
-                    case 'Level 2': code = 'mt2'; break;
-                    case 'Level 3': code = 'mt3'; break;
-                }
-                break;
+        if (topic === undefined || level === undefined) {
+            alert("Select both topic and level");
+        } else {
+            localStorage.setItem("topic", topic);
+            localStorage.setItem("level", level);
+            let code;
+            switch(topic) {
+                case 'General Knowledge':
+                    switch(level) {
+                        case 'Level 1': code = 'gk1'; break;
+                        case 'Level 2': code = 'gk2'; break;
+                        case 'Level 3': code = 'gk3'; break;
+                    }
+                    break;
+                case 'Science':
+                    switch(level) {
+                        case 'Level 1': code = 'sc1'; break;
+                        case 'Level 2': code = 'sc2'; break;
+                        case 'Level 3': code = 'sc3'; break;
+                    }
+                    break;
+                case 'Mathematics':
+                    switch(level) {
+                        case 'Level 1': code = 'mt1'; break;
+                        case 'Level 2': code = 'mt2'; break;
+                        case 'Level 3': code = 'mt3'; break;
+                    }
+                    break;
+            }
+            const data = {
+                code: code
+            };
+            // Send a POST request
+            fetch("/getQuiz", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                localStorage.setItem("Received", JSON.stringify(data.questions));
+                localStorage.setItem("code", JSON.stringify(data.code));
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            })
+            .then( () => {
+                window.location.href = "/getQuiz";
+            })
         }
-
-        const data = {
-            code: code
-        };
-
-        // Send a POST request
-        fetch("/getQuiz", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(data => {
-            localStorage.setItem("Received", JSON.stringify(data.questions));
-            localStorage.setItem("code", JSON.stringify(data.code));
-        })
-        .catch(error => {
-            console.error("Error:", error);
-        })
-        .then( () => {
-            window.location.href = "/getQuiz";
-        })
     })
 }
 
@@ -349,23 +348,38 @@ if (tryQ) {
             code: codeIP.value,
         };
 
-        // Send a POST request
-        fetch("/getQuiz", {
+        fetch('/checkCode', {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(data)
         })
-        .then(response => response.json())
-        .then(data => {
-            localStorage.setItem("Received", JSON.stringify(data.questions));
-        })
-        .catch(error => {
-            console.error("Error:", error);
-        })
-        .then( () => {
-            window.location.href = "/getQuiz";
+        .then (response => response.json())
+        .then (res => {
+            if (res.message === "Code exists") {
+                // Send a POST request
+                fetch("/getQuiz", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    localStorage.setItem("Received", JSON.stringify(data.questions));
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                })
+                .then( () => {
+                    window.location.href = "/getQuiz";
+                })
+            } else {
+                alert("Quiz does not exist");
+                codeIP.value = "";
+            }
         })
     });
 }
