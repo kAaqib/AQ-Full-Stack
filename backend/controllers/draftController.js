@@ -63,32 +63,40 @@ exports.getMyDrafts = async (req, res) => {
 
 exports.getViewDQuiz = async (req, res) => {
     let code = req.body.code;
-    if (code.includes('"')) {
-        code = code.slice(1, code.length - 1);
-    }
-    try {
-        const quiz = await Draft.findOne({ code: code });
-        if (quiz) {
-            res.status(200).json(quiz.questions);
-        } else {
-            res.status(404).json({ error: 'No drafts with this code' });
+    if (code !== undefined) {
+        if (code.includes('"')) {
+            code = code.slice(1, code.length - 1);
         }
-    } catch (error) {
-        res.status(500).json({ error: 'Server error' });
+        try {
+            const quiz = await Draft.findOne({ code: code });
+            if (quiz) {
+                res.status(200).json(quiz.questions);
+            } else {
+                res.status(404).json({ error: 'No drafts with this code' });
+            }
+        } catch (error) {
+            res.status(500).json({ error: 'Server error' });
+        }
+    } else {
+        res.status(400).json({error: "Code not sent"});
     }
 };
 
 exports.getEditDQuiz = async (req, res) => {
     let code = req.body.code;
-    try {
-        const quiz = await Draft.findOne({ code: code });
-        if (quiz) {
-            res.status(200).json({ code: code, questions: quiz.questions });
-        } else {
-            res.status(404).json({ error: 'No drafts with this code' });
+    if (code !== undefined) {
+        try {
+            const quiz = await Draft.findOne({ code: code });
+            if (quiz) {
+                res.status(200).json({ code: code, questions: quiz.questions });
+            } else {
+                res.status(404).json({ error: 'No drafts with this code' });
+            }
+        } catch (error) {
+            res.status(500).json({ error: 'Server error' });
         }
-    } catch (error) {
-        res.status(500).json({ error: 'Server error' });
+    } else {
+        res.status(400).json({error: "Code not sent"});
     }
 };
 

@@ -22,8 +22,8 @@ if(username) {
                 }
             });
 
+            const result = await response.json();
             if (response.ok) {
-                const result = await response.json();
                 // Handle success - redirect or update the UI as needed
                 if (result.msg === "Success") {
                     // Assuming result.success indicates a successful login
@@ -33,11 +33,9 @@ if(username) {
                     alert('Login failed: ' + result.err);
                 }
             } else {
-                console.error('Error:', response.statusText);
-                alert('Error: ' + response.statusText);
+                alert('Error: ' + JSON.stringify(result.err));
             }
         } catch (error) {
-            console.error('Fetch error:', error);
             alert('Fetch error: ' + error.message);
         }
     });
@@ -59,17 +57,14 @@ if (regsub) {
                 }
             });
               
+            const result = await response.json();
             if (response.ok) {
                 // If the response is a redirect (successful registration), we manually follow the redirect
-                const result = await response.json();
                 if (result.msg === "Success") {
                   window.location.href = '/';
-                } else {
-                  alert('Error: ' + result.msg);
                 }
             } else {
-                console.error('Error:', response.statusText);
-                alert('Error: ' + response.statusText);
+                alert('Error: ' + JSON.stringify(result.msg));
             }
         } catch (error) {
             console.error('Fetch error:', error);

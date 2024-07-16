@@ -10,7 +10,7 @@ router.post('/leaderboard', getTopScores);
 router.post('/myquizzes', getMyQuizzes);
 router.post('/myanswers', getMyAnswers);
 router.get('/responsesData', getResponses);
-router.delete('/deletequizData', deleteQuiz);
+router.delete('/deletequiz', deleteQuiz);
 router.post('/review', getReview);
 router.post('/viewquiz', getViewQuiz);
 router.post('/editquiz', getEditQuiz);

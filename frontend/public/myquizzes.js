@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const quizCode = event.target.getAttribute('data-quiz-code');
             const uname = event.target.getAttribute('data-uname');
             try {
-                const response = await fetch(`/deleteDquizData?quizCode=${quizCode}&uname=${uname}`, {
+                const response = await fetch(`/deletedraft?quizCode=${quizCode}&uname=${uname}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json'
@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 code: quizCode
             }
             try {
-                await fetch("/viewDquiz", {
+                await fetch("/viewdraft", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 code: quizCode,
             }
             try {
-                await fetch("/editDquiz", {
+                await fetch("/editdraft", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

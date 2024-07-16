@@ -4,7 +4,8 @@ const path = require('path');
 
 exports.registerUser = async (req, res) => {
     const { username, password } = req.body;
-    if (username && password !== "") {
+    console.log(username)
+    if (username && password !== undefined && username && password !== "" && /[a-zA-Z]/.test(username) && /[a-zA-Z]/.test(password)) {
         const unExists = await Login.findOne({ username: username });
         try {
             if (unExists) {
@@ -13,8 +14,7 @@ exports.registerUser = async (req, res) => {
                 bcrypt.genSalt(10, function (err, Salt) {
                     bcrypt.hash(password, Salt, async function (err, hash) {
                         if (err) {
-                            console.log('Cannot encrypt');
-                            return res.status(500).json({ error: 'Server error' });
+                            return res.status(400).json('Invalid password');
                         }
                         const user = new Login({ username: username, password: hash });
                         await user.save();
@@ -26,13 +26,31 @@ exports.registerUser = async (req, res) => {
             res.status(500).json({ error: 'Server error' });
         }
     } else {
-        res.status(400).json({ error: "Empty username & password" });
+        if (username === undefined && password === undefined)
+            res.status (400).json({ error: "No username and password were sent"});
+        else if (username === undefined)
+            res.status (400).json({ error: "No username was sent"});
+        else if (password === undefined)
+            res.status (400).json({ error: "No password was sent"});
+        else if (username === "" && password === "")
+            res.status (400).json({ error: "Empty username and password"});
+        else if (username === "")
+            res.status(400).json({ error: "Empty username" });
+        else if (password === "")
+            res.status(400).json({ error: "Empty password" });
+        else if (!/[a-zA-Z]/.test(username))
+            res.status(400).json({ error: "Invalid username, should contain alphabets" });
+        else if (!/[a-zA-Z]/.test(password))
+            res.status(400).json({ error: "Invalid password, should contain alphabets" });
+        else {
+            res.status(400).json({ error: "Invalid inut" });
+        }
     }
 };
 
 exports.validateUser = async (req, res) => {
     const { username, password } = req.body;
-    if (username && password !== "") {
+    if (username && password !== undefined && username && password !== "" && /[a-zA-Z]/.test(username) && /[a-zA-Z]/.test(password)) {
         try {
             const user = await Login.findOne({ username: username });
             if (!user) {
@@ -48,6 +66,24 @@ exports.validateUser = async (req, res) => {
             res.status(500).json({ error: 'Server error' });
         }
     } else {
-        res.status(400).json({ error: "Empty username & password" });
+        if (username === undefined && password === undefined)
+            res.status (400).json({ error: "No username and password were sent"});
+        else if (username === undefined)
+            res.status (400).json({ error: "No username was sent"});
+        else if (password === undefined)
+            res.status (400).json({ error: "No password was sent"});
+        else if (username === "" && password === "")
+            res.status (400).json({ error: "Empty username and password"});
+        else if (username === "")
+            res.status(400).json({ error: "Empty username" });
+        else if (password === "")
+            res.status(400).json({ error: "Empty password" });
+        else if (!/[a-zA-Z]/.test(username))
+            res.status(400).json({ error: "Invalid username, should contain alphabets" });
+        else if (!/[a-zA-Z]/.test(password))
+            res.status(400).json({ error: "Invalid password, should contain alphabets" });
+        else {
+            res.status(400).json({ error: "Invalid inut" });
+        }
     }
 };

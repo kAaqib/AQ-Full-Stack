@@ -158,18 +158,22 @@ exports.getScore = async (req, res) => {
 
 exports.getTopScores = async (req, res) => {
     let code = req.body.code;
-    if (code.includes('"')) {
-        code = code.substring(1, code.length - 1);
-    }
-    try {
-        const quiz = await Quiz.findOne({ code: code });
-        if (!quiz) {
-            return res.status(404).json({ error: 'Quiz not found' });
+    if (code !== undefined) {
+        if (code.includes('"')) {
+            code = code.substring(1, code.length - 1);
         }
-        let topScores = quiz.scores.sort((a, b) => b.score - a.score).slice(0, 10);
-        res.status(200).json({ "Top10": topScores });
-    } catch (error) {
-        res.status(500).json({ error: 'Server error' });
+        try {
+            const quiz = await Quiz.findOne({ code: code });
+            if (!quiz) {
+                return res.status(404).json({ error: 'Quiz not found' });
+            }
+            let topScores = quiz.scores.sort((a, b) => b.score - a.score).slice(0, 10);
+            res.status(200).json({ "Top10": topScores });
+        } catch (error) {
+            res.status(500).json({ error: 'Server error' });
+        }
+    } else {
+        res.status(400).json({error: "Code not sent"});
     }
 };
 
@@ -240,49 +244,61 @@ exports.deleteQuiz = async (req, res) => {
 exports.getReview = async (req, res) => {
     const username = req.body.name;
     let code = req.body.code;
-    if (code.includes('"')) {
-        code = code.slice(1, code.length - 1);
-    }
-    try {
-        const user = await Answered.findOne({ username: username });
-        if (user) {
-            let ans = user.answered.filter(arr => arr.code === code);
-            res.status(200).json(ans[0].qna);
-        } else {
-            res.status(404).json({ error: 'No answers found for this quiz' });
+    if (code !== undefined) {
+        if (code.includes('"')) {
+            code = code.slice(1, code.length - 1);
         }
-    } catch (error) {
-        res.status(500).json({ error: 'Server error' });
+        try {
+            const user = await Answered.findOne({ username: username });
+            if (user) {
+                let ans = user.answered.filter(arr => arr.code === code);
+                res.status(200).json(ans[0].qna);
+            } else {
+                res.status(404).json({ error: 'No answers found for this quiz' });
+            }
+        } catch (error) {
+            res.status(500).json({ error: 'Server error' });
+        }
+    } else {
+        res.status(400).json({error: "Code not sent"});
     }
 };
 
 exports.getViewQuiz = async (req, res) => {
     let code = req.body.code;
-    if (code.includes('"')) {
-        code = code.slice(1, code.length - 1);
-    }
-    try {
-        const quiz = await Quiz.findOne({ code: code });
-        if (quiz) {
-            res.status(200).json(quiz.questions);
-        } else {
-            res.status(404).json({ error: 'Quiz not found' });
+    if (code !== undefined) {
+        if (code.includes('"')) {
+            code = code.slice(1, code.length - 1);
         }
-    } catch (error) {
-        res.status(500).json({ error: 'Server error' });
+        try {
+            const quiz = await Quiz.findOne({ code: code });
+            if (quiz) {
+                res.status(200).json(quiz.questions);
+            } else {
+                res.status(404).json({ error: 'Quiz not found' });
+            }
+        } catch (error) {
+            res.status(500).json({ error: 'Server error' });
+        }
+    } else {
+        res.status(400).json({error: "Code not sent"});
     }
 };
 
 exports.getEditQuiz = async (req, res) => {
     let code = req.body.code;
-    try {
-        const quiz = await Quiz.findOne({ code: code });
-        if (quiz) {
-            res.status(200).json({ code: code, questions: quiz.questions });
-        } else {
-            res.status(404).json({ error: 'Quiz not found' });
+    if (code !== undefined) {
+        try {
+            const quiz = await Quiz.findOne({ code: code });
+            if (quiz) {
+                res.status(200).json({ code: code, questions: quiz.questions });
+            } else {
+                res.status(404).json({ error: 'Quiz not found' });
+            }
+        } catch (error) {
+            res.status(500).json({ error: 'Server error' });
         }
-    } catch (error) {
-        res.status(500).json({ error: 'Server error' });
+    } else {
+        res.status(400).json({error: "Code not sent"});
     }
 };
