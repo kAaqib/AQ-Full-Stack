@@ -213,14 +213,22 @@ exports.getResponses = async (req, res) => {
 exports.deleteQuiz = async (req, res) => {
     const quizCode = req.query.quizCode;
     const uname = req.query.uname;
-    try {
-        await Quiz.deleteOne({ code: quizCode });
-        const user = await Login.findOne({ username: uname});
-        user.myquizzes = user.myquizzes.filter(code => code !== quizCode);
-        user.save();
-        res.json(user.myquizzes);
-    } catch (error) {
-        res.status(500).json({error: 'Server error'});
+    if (uname !== "" && quizCode !== "") {
+        try {
+            await Quiz.deleteOne({ code: quizCode });
+            const user = await Login.findOne({ username: uname});
+            if (user) {
+                user.myquizzes = user.myquizzes.filter(obj => obj.code !== quizCode);
+                await user.save();
+                res.json(user.myquizzes);
+            } else {
+                res.json({error: "User does not exist"});
+            }
+        } catch (error) {
+            res.status(500).json({error: 'Quiz does not exist'});
+        }
+    } else {
+        res.json({error: "Quiz code cannot be empty"});
     }
 }
 
