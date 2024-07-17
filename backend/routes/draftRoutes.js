@@ -4,7 +4,8 @@ const router = express.Router();
 
 
 router.get('/api/v1/drafts/:code', getViewDQuiz);
-router.get('/api/v1/drafts/:code/edit', getEditDQuiz);
+
+router.put('/api/v1/drafts/:code', getEditDQuiz);
 
 router.post('/api/v1/drafts', getSaveDraft);
 

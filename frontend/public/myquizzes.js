@@ -86,8 +86,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (event.target.classList.contains('edit-quiz')) {
                 const quizCode = event.target.getAttribute('data-quiz-code');
                 try {
-                    await fetch(`/api/v1/quizzes/${quizCode}/edit`, {
-                        method: 'GET',
+                    await fetch(`/api/v1/quizzes/${quizCode}`, {
+                        method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json'
                         }
@@ -173,8 +173,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (event.target.classList.contains('edit-quiz')) {
                 const quizCode = event.target.getAttribute('data-quiz-code');
                 try {
-                    await fetch(`/api/v1/drafts/${quizCode}/edit`, {
-                        method: 'GET',
+                    await fetch(`/api/v1/drafts/${quizCode}`, {
+                        method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json'
                         }

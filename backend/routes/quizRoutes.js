@@ -7,7 +7,8 @@ router.get('/api/v1/quizzes/:code/leaderboard', getTopScores);
 router.get('/api/v1/quizzes/:code/responses', getResponses);
 router.get('/api/v1/quizzes/:username/:code/review', getReview);
 router.get('/api/v1/quizzes/:code/view', getViewQuiz);
-router.get('/api/v1/quizzes/:code/edit', getEditQuiz);
+
+router.put('/api/v1/quizzes/:code', getEditQuiz);
 
 router.post('/api/v1/quizzes/check-code', checkCode);
 router.post('/api/v1/quizzes', saveQuiz);
