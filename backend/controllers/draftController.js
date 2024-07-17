@@ -18,6 +18,7 @@ exports.getSaveDraft = async (req, res) => {
 
         if (user) {
             user.myquizzes = user.myquizzes.filter(arr => arr.code !== code);
+            user.mydrafts = user.mydrafts.filter(arr => arr.code !== code);
             user.mydrafts.push(quizCodenDate);
             await user.save();
         } else {
@@ -47,22 +48,8 @@ exports.getSaveDraft = async (req, res) => {
     }
 };
 
-exports.getMyDrafts = async (req, res) => {
-    const username = req.body.username;
-    try {
-        const user = await Login.findOne({ username: username });
-        if (user) {
-            res.status(200).json(user.mydrafts);
-        } else {
-            res.status(404).json({ error: 'User not found' });
-        }
-    } catch (err) {
-        res.status(500).json({ error: 'Server error' });
-    }
-};
-
 exports.getViewDQuiz = async (req, res) => {
-    let code = req.body.code;
+    let code = req.params.code;
     if (code !== undefined) {
         if (code.includes('"')) {
             code = code.slice(1, code.length - 1);
@@ -83,7 +70,7 @@ exports.getViewDQuiz = async (req, res) => {
 };
 
 exports.getEditDQuiz = async (req, res) => {
-    let code = req.body.code;
+    let code = req.params.code;
     if (code !== undefined) {
         try {
             const quiz = await Draft.findOne({ code: code });
@@ -101,8 +88,8 @@ exports.getEditDQuiz = async (req, res) => {
 };
 
 exports.deleteDQuiz = async (req, res) => {
-    const quizCode = req.query.quizCode;
-    const uname = req.query.uname;
+    const quizCode = req.params.code;
+    const uname = req.params.username;
     try {
         await Draft.deleteOne({ code: quizCode });
         const user = await Login.findOne({ username: uname });

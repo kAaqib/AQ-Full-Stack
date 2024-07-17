@@ -1,38 +1,19 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const quizCode = urlParams.get('quizCode');
-    
-    if (quizCode) {
-        try {
-            const response = await fetch(`/responsesData?quizCode=${quizCode}`);
-            const jsonResponse = await response.json();
+    const data = JSON.parse(localStorage.getItem("Responses"));
+    let scores = data.Scores;
+    let quizCode = data.code;
+    const tbody = document.getElementById('quizrestb');
 
-            if (jsonResponse.error) {
-                console.error(jsonResponse.error);
-                return;
-            }
-
-            const scores = jsonResponse.Scores;
-
-            const tbody = document.getElementById('quizrestb');
-
-            scores.forEach((scoreData, index) => {
-                var s = new Date(scoreData.lastanswered).toLocaleString('en-GB', {timeZone: 'Asia/Kolkata'});
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${scoreData.username}</td>
-                    <td>${scoreData.score}</td>
-                    <td><button class="review-quiz btn" data-quiz-code="${quizCode}" data-uname="${scoreData.username}">Review</button></td>
-                    <td>${s}</td>
-                `;
-                tbody.appendChild(row);
-            });
-
-        } catch (err) {
-            console.error('Error fetching responses:', err);
-        }
-    } else {
-        console.error('Quiz code is missing in the URL');
-    }
+    scores.forEach((scoreData, index) => {
+        var s = new Date(scoreData.lastanswered).toLocaleString('en-GB', {timeZone: 'Asia/Kolkata'});
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${scoreData.username}</td>
+            <td>${scoreData.score}</td>
+            <td><button class="review-quiz btn" data-quiz-code="${quizCode}" data-uname="${scoreData.username}">Review</button></td>
+            <td>${s}</td>
+        `;
+        tbody.appendChild(row);
+    });
 });

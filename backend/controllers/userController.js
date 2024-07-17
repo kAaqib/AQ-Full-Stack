@@ -1,10 +1,11 @@
 const Login = require('../models/loginModel');
+const Answered = require('../models/answerModel');
+const Draft = require("../models/draftModel");
 const bcrypt = require('bcryptjs');
 const path = require('path');
 
 exports.registerUser = async (req, res) => {
     const { username, password } = req.body;
-    console.log(username)
     if (username && password !== undefined && username && password !== "" && /[a-zA-Z]/.test(username) && /[a-zA-Z]/.test(password)) {
         const unExists = await Login.findOne({ username: username });
         try {
@@ -85,5 +86,47 @@ exports.validateUser = async (req, res) => {
         else {
             res.status(400).json({ error: "Invalid inut" });
         }
+    }
+};
+
+exports.getMyQuizzes = async (req, res) => {
+    const username = req.params.username;
+    try {
+        const user = await Login.findOne({ username: username });
+        if (user) {
+            res.status(200).json(user.myquizzes);
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+exports.getMyAnswers = async (req, res) => {
+    const username = req.params.username;
+    try {
+        const user = await Answered.findOne({ username: username });
+        if (user) {
+            res.status(200).json(user.answered);
+        } else {
+            res.status(404).json({ message: "You have not attempted any quizzes" });
+        }
+    } catch (err) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+exports.getMyDrafts = async (req, res) => {
+    const username = req.params.username;
+    try {
+        const user = await Login.findOne({ username: username });
+        if (user) {
+            res.status(200).json(user.mydrafts);
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: 'Server error' });
     }
 };

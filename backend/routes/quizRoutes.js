@@ -2,17 +2,17 @@ const express = require('express');
 const { getQuiz, checkCode, saveQuiz, getScore, getTopScores, getMyQuizzes, getMyAnswers, getResponses, deleteQuiz, getReview, getViewQuiz, getEditQuiz } = require('../controllers/quizController');
 const router = express.Router();
 
-router.post('/getQuiz', getQuiz);
-router.post('/checkCode', checkCode);
-router.post('/saveQuiz', saveQuiz);
-router.post('/getScore', getScore);
-router.post('/leaderboard', getTopScores);
-router.post('/myquizzes', getMyQuizzes);
-router.post('/myanswers', getMyAnswers);
-router.get('/responsesData', getResponses);
-router.delete('/deletequiz', deleteQuiz);
-router.post('/review', getReview);
-router.post('/viewquiz', getViewQuiz);
-router.post('/editquiz', getEditQuiz);
+router.get('/api/v1/quizzes/:code', getQuiz);
+router.get('/api/v1/quizzes/:code/leaderboard', getTopScores);
+router.get('/api/v1/quizzes/:code/responses', getResponses);
+router.get('/api/v1/quizzes/:username/:code/review', getReview);
+router.get('/api/v1/quizzes/:code/view', getViewQuiz);
+router.get('/api/v1/quizzes/:code/edit', getEditQuiz);
+
+router.post('/api/v1/quizzes/check-code', checkCode);
+router.post('/api/v1/quizzes', saveQuiz);
+router.post('/api/v1/quizzes/score', getScore);
+
+router.delete('/api/v1/quizzes/:username/:code', deleteQuiz);
 
 module.exports = router;

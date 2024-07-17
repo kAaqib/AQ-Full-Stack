@@ -1,11 +1,13 @@
 const express = require('express');
-const { getSaveDraft, getMyDrafts, getViewDQuiz, getEditDQuiz, deleteDQuiz } = require('../controllers/draftController');
+const { getSaveDraft, getViewDQuiz, getEditDQuiz, deleteDQuiz } = require('../controllers/draftController');
 const router = express.Router();
 
-router.post('/savedraft', getSaveDraft);
-router.post('/mydrafts', getMyDrafts);
-router.post('/viewdraft', getViewDQuiz);
-router.post('/editdraft', getEditDQuiz);
-router.delete('/deletedraft', deleteDQuiz);
+
+router.get('/api/v1/drafts/:code', getViewDQuiz);
+router.get('/api/v1/drafts/:code/edit', getEditDQuiz);
+
+router.post('/api/v1/drafts', getSaveDraft);
+
+router.delete('/api/v1/drafts/:username/:code', deleteDQuiz);
 
 module.exports = router;

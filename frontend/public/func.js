@@ -84,6 +84,7 @@ if (startbtn) {
     localStorage.setItem("topic", "");
     localStorage.setItem("level", "");
     localStorage.setItem("View", "");
+    localStorage.setItem("Responses", "");
 }
 
 const topicEls = document.querySelectorAll(".topic");
@@ -156,16 +157,12 @@ if (selbtn) {
                     }
                     break;
             }
-            const data = {
-                code: code
-            };
             // Send a POST request
-            fetch("/getQuiz", {
-                method: "POST",
+            fetch(`/api/v1/quizzes/${code}`, {
+                method: "GET",
                 headers: {
                     "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)
+                }
             })
             .then(response => response.json())
             .then(data => {
@@ -176,7 +173,7 @@ if (selbtn) {
                 console.error("Error:", error);
             })
             .then( () => {
-                window.location.href = "/getQuiz";
+                window.location.href = "/quiz.html";
             })
         }
     })
@@ -295,7 +292,7 @@ if (quiz) {
         }
         const answersObject = Object.fromEntries(answers);
         let sc;
-        fetch("/getScore", {
+        fetch("/api/v1/quizzes/score", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -339,11 +336,12 @@ if (tryQ) {
         localStorage.setItem("code", codeIP.value);
         localStorage.setItem("topic", "");
         localStorage.setItem("level", "");
+        let code = codeIP.value;
         const data = {
-            code: codeIP.value,
+            code: code,
         };
 
-        fetch('/checkCode', {
+        fetch('/api/v1/quizzes/check-code', {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -352,14 +350,13 @@ if (tryQ) {
         })
         .then (response => response.json())
         .then (res => {
-            if (res.message === "Code exists") {
+            if (res.message === "Quiz code exists") {
                 // Send a POST request
-                fetch("/getQuiz", {
-                    method: "POST",
+                fetch(`/api/v1/quizzes/${code}`, {
+                    method: "GET",
                     headers: {
                         "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(data)
+                    }
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -369,7 +366,7 @@ if (tryQ) {
                     console.error("Error:", error);
                 })
                 .then( () => {
-                    window.location.href = "/getQuiz";
+                    window.location.href = "/quiz.html";
                 })
             } else {
                 alert("Quiz does not exist");
@@ -389,7 +386,7 @@ if (checkCode) {
         data = {
             code: checkCode.value
         }
-        fetch('/checkCode', {
+        fetch('/api/v1/quizzes/check-code', {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -542,7 +539,7 @@ if (addQ) {
             if (response.ok) {
                 const result = await response.json();
                 // Handle success - redirect or update the UI as needed
-                if (result.message === 'Quiz saved successfully!') {
+                if (result.message === 'Quiz saved successfully!' || 'Draft saved successfully!') {
                     // Assuming result.success indicates a successful login
                     window.location.href = '/myquizzes.html'; // Redirect to home page
                 } else {
@@ -584,15 +581,11 @@ const myquiztb = document.getElementById("myquiztb");
 if (myquiztb) {
     try {
         const uname = localStorage.getItem("myName");
-        const data = {
-            username: uname
-        };
-        fetch('/myquizzes', {
-            method: "POST",
+        fetch(`/api/v1/users/${uname}/quizzes`, {
+            method: "GET",
             headers: {
                 "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
+            }
         })
         .then (response => response.json())
         .then (myquizzes => {
@@ -604,7 +597,7 @@ if (myquiztb) {
                 row.innerHTML = `
                 <td>${index + 1}</td>
                 <td>${quiz.code}</td>
-                <td><a href="/responses?quizCode=${quiz.code}">View Responses</a></td>
+                <td><button class="resp-quiz btn" data-quiz-code="${quiz.code}" data-uname="${uname}">View Responses</button></td>
                 <td><button class="view-quiz btn" data-quiz-code="${quiz.code}" data-uname="${uname}">View Quiz</button></td>
                 <td><button class="edit-quiz btn" data-quiz-code="${quiz.code}" data-uname="${uname}">Edit Quiz</button></td>
                 <td><button class="delete-quiz btn" data-quiz-code="${quiz.code}" data-uname="${uname}">Delete</button></td>
@@ -622,15 +615,11 @@ const mydrafttb = document.getElementById("mydrafttb");
 if (mydrafttb) {
     try {
         const uname = localStorage.getItem("myName");
-        const data = {
-            username: uname
-        };
-        fetch('/mydrafts', {
-            method: "POST",
+        fetch(`/api/v1/users/${uname}/drafts`, {
+            method: "GET",
             headers: {
                 "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
+            }
         })
         .then (response => response.json())
         .then (mydrafts => {
@@ -659,15 +648,11 @@ const myanstb = document.getElementById("myanstb");
 if (myanstb) {
     try {
         const uname = localStorage.getItem("myName");
-        const data = {
-            username: uname
-        };
-        fetch('/myanswers', {
-            method: "POST",
+        fetch(`/api/v1/users/${uname}/answers`, {
+            method: "GET",
             headers: {
                 "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
+            }
         })
         .then (response => response.json())
         .then (myanswers => {
@@ -691,16 +676,13 @@ if (myanstb) {
 };
 
 function leaderboard() {
-    const data = {
-      code: localStorage.getItem("code")
-    };
+    let code = localStorage.getItem("code")
     // Send a POST request
-    fetch("/leaderboard", {
-        method: "POST",
+    fetch(`/api/v1/quizzes/${code}/leaderboard`, {
+        method: "GET",
         headers: {
             "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
+        }
     })
     .then(res => res.json())
     .then( data => {
@@ -711,17 +693,14 @@ function leaderboard() {
 }
 
 function review() {
-    const data = {
-        name: localStorage.getItem("myName"),
-        code: localStorage.getItem("code")
-    };
+    let name = localStorage.getItem("myName");
+    let code = localStorage.getItem("code");
 
-    fetch("/review", {
-      method: "POST",
+    fetch(`/api/v1/quizzes/${name}/${code}/review`, {
+      method: "GET",
       headers: {
           "Content-Type": "application/json"
-      },
-      body: JSON.stringify(data)
+      }
     })
     .then(res => res.json())
     .then(data => {
@@ -873,9 +852,9 @@ if (addQ && editflag == "true") {
 if (addQ) {
     document.getElementById("draftbtn").addEventListener("click", () => {
         const qf = document.getElementById("quizForm");
-        qf.setAttribute("action", "/savedraft");
+        qf.setAttribute("action", "/api/v1/drafts");
         subMake.click();
-        qf.setAttribute("action", "/saveQuiz");
+        qf.setAttribute("action", "/api/v1/quizzes");
     })
 }
 

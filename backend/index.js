@@ -64,7 +64,7 @@ app.get("/getTopicPage", function(req, res) {
     res.sendFile(path.join(__dirname, "../frontend/views/topic.html"));
 });
 
-app.get("/getQuiz", function(req, res) {
+app.get("/quiz.html", function(req, res) {
     res.sendFile(path.join(__dirname, "../frontend/views/quiz.html"));
 });
 
