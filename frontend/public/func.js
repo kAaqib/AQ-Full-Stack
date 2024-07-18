@@ -396,7 +396,7 @@ if (checkCode) {
         .then (response => response.json())
         .then (res => {
             if (res.message !== "lesgooo") {
-                alert(res.message);
+                alert("Quiz code exists");
                 checkCode.value = "";
             }
         })
@@ -581,11 +581,15 @@ const myquiztb = document.getElementById("myquiztb");
 if (myquiztb) {
     try {
         const uname = localStorage.getItem("myName");
-        fetch(`/api/v1/users/${uname}/quizzes`, {
-            method: "GET",
+        let data = {
+            username: uname
+        }
+        fetch(`/api/v1/users/quizzes`, {
+            method: "POST",
             headers: {
                 "Content-Type": "application/json"
-            }
+            },
+            body: JSON.stringify(data)
         })
         .then (response => response.json())
         .then (myquizzes => {
@@ -594,48 +598,21 @@ if (myquiztb) {
             myquizzes.forEach((quiz, index) => {
                 var s = new Date(quiz.lastupdate).toLocaleString('en-GB', {timeZone: 'Asia/Kolkata'});
                 const row = document.createElement('tr');
+                var status;
+                if (quiz.status)
+                    status = "Active"
+                else
+                    status = "Inactive"
                 row.innerHTML = `
                 <td>${index + 1}</td>
                 <td>${quiz.code}</td>
-                <td><button class="resp-quiz btn" data-quiz-code="${quiz.code}" data-uname="${uname}">View Responses</button></td>
-                <td><button class="view-quiz btn" data-quiz-code="${quiz.code}" data-uname="${uname}">View Quiz</button></td>
-                <td><button class="edit-quiz btn" data-quiz-code="${quiz.code}" data-uname="${uname}">Edit Quiz</button></td>
-                <td><button class="delete-quiz btn" data-quiz-code="${quiz.code}" data-uname="${uname}">Delete</button></td>
+                <td><button class="resp-quiz tbbtn" data-quiz-code="${quiz.code}" data-uname="${uname}">View Responses</button></td>
+                <td><button class="view-quiz tbtn" data-quiz-code="${quiz.code}" data-uname="${uname}">View</button></td>
+                <td><button class="edit-quiz tbtn" data-quiz-code="${quiz.code}" data-uname="${uname}">Edit</button></td>
+                <td><button class="delete-quiz tbtn" data-quiz-code="${quiz.code}" data-uname="${uname}">Delete</button></td>
+                <td>${status}<button class="toggle-quiz tbtn" data-quiz-code="${quiz.code}" data-uname="${uname}">Toggle</button></td>
                 <td>${s}</td>
                 `;
-                tbody.appendChild(row);
-            });
-        })
-    } catch (err) {
-        console.error('Error fetching quizzes:', err);
-    }
-};
-
-const mydrafttb = document.getElementById("mydrafttb");
-if (mydrafttb) {
-    try {
-        const uname = localStorage.getItem("myName");
-        fetch(`/api/v1/users/${uname}/drafts`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        })
-        .then (response => response.json())
-        .then (mydrafts => {
-            const tbody = document.getElementById('mydrafttb');
-            
-            mydrafts.forEach((quiz, index) => {
-                var s = new Date(quiz.lastupdate).toLocaleString('en-GB', {timeZone: 'Asia/Kolkata'});
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${quiz.code}</td>
-                    <td><button class="view-quiz btn" data-quiz-code="${quiz.code}" data-uname="${uname}">View Quiz</button></td>
-                    <td><button class="edit-quiz btn" data-quiz-code="${quiz.code}" data-uname="${uname}">Edit Quiz</button></td>
-                    <td><button class="delete-quiz btn" data-quiz-code="${quiz.code}" data-uname="${uname}">Delete</button></td>
-                    <td>${s}</td>
-                    `;
                 tbody.appendChild(row);
             });
         })
@@ -648,11 +625,15 @@ const myanstb = document.getElementById("myanstb");
 if (myanstb) {
     try {
         const uname = localStorage.getItem("myName");
-        fetch(`/api/v1/users/${uname}/answers`, {
-            method: "GET",
+        let data = {
+            username: uname
+        }
+        fetch(`/api/v1/users/answers`, {
+            method: "POST",
             headers: {
                 "Content-Type": "application/json"
-            }
+            },
+            body: JSON.stringify(data)
         })
         .then (response => response.json())
         .then (myanswers => {
@@ -664,7 +645,7 @@ if (myanstb) {
                 <td>${(index + 1)}</td>
                 <td>${ind.code}</td>
                 <td><a href="/responses?quizCode=${ind.code}">${ind.score}</a></td>
-                <td><button class="review-quiz btn" data-quiz-code="${ind.code}" data-uname="${uname}">Review</button></td>
+                <td><button class="review-quiz tbbtn" data-quiz-code="${ind.code}" data-uname="${uname}">Review</button></td>
                 <td>${s}</td>
                 `;
                 anstbody.appendChild(row);
@@ -695,12 +676,16 @@ function leaderboard() {
 function review() {
     let name = localStorage.getItem("myName");
     let code = localStorage.getItem("code");
-
-    fetch(`/api/v1/quizzes/${name}/${code}/review`, {
-      method: "GET",
+    let data = {
+        username: name,
+        code: code
+    }
+    fetch(`/api/v1/quizzes/review`, {
+      method: "POST",
       headers: {
           "Content-Type": "application/json"
-      }
+      },
+      body: JSON.stringify(data)
     })
     .then(res => res.json())
     .then(data => {

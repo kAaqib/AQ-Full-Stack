@@ -6,12 +6,17 @@ document.addEventListener('DOMContentLoaded', function() {
             if (event.target.classList.contains('review-quiz')) {
                 const quizCode = event.target.getAttribute('data-quiz-code');
                 const uname = event.target.getAttribute('data-uname');
+                let data = {
+                    username: uname,
+                    code: quizCode
+                }
                 try {
-                    await fetch(`/api/v1/quizzes/${uname}/${quizCode}/review`, {
-                        method: 'GET',
+                    await fetch(`/api/v1/quizzes/review`, {
+                        method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
-                        }
+                        },
+                        body: JSON.stringify(data)
                     })
                     .then(res => res.json())
                     .then(data => {
@@ -33,12 +38,17 @@ document.addEventListener('DOMContentLoaded', function() {
             if (event.target.classList.contains('review-quiz')) {
                 const quizCode = event.target.getAttribute('data-quiz-code');
                 const uname = event.target.getAttribute('data-uname');
+                let data = {
+                    username: uname,
+                    code: quizCode
+                }
                 try {
-                    await fetch(`/api/v1/quizzes/${uname}/${quizCode}/review`, {
-                        method: 'GET',
+                    await fetch(`/api/v1/quizzes/review`, {
+                        method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         },
+                        body: JSON.stringify(data)
                     })
                     .then(res => res.json())
                     .then(data => {

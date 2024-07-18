@@ -1,8 +1,6 @@
 const Login = require('../models/loginModel');
 const Answered = require('../models/answerModel');
-const Draft = require("../models/draftModel");
 const bcrypt = require('bcryptjs');
-const path = require('path');
 
 exports.registerUser = async (req, res) => {
     const { username, password } = req.body;
@@ -90,7 +88,7 @@ exports.validateUser = async (req, res) => {
 };
 
 exports.getMyQuizzes = async (req, res) => {
-    const username = req.params.username;
+    const username = req.body.username;
     try {
         const user = await Login.findOne({ username: username });
         if (user) {
@@ -104,7 +102,7 @@ exports.getMyQuizzes = async (req, res) => {
 };
 
 exports.getMyAnswers = async (req, res) => {
-    const username = req.params.username;
+    const username = req.body.username;
     try {
         const user = await Answered.findOne({ username: username });
         if (user) {
@@ -114,19 +112,5 @@ exports.getMyAnswers = async (req, res) => {
         }
     } catch (err) {
         res.status(500).json({ error: 'Internal server error' });
-    }
-};
-
-exports.getMyDrafts = async (req, res) => {
-    const username = req.params.username;
-    try {
-        const user = await Login.findOne({ username: username });
-        if (user) {
-            res.status(200).json(user.mydrafts);
-        } else {
-            res.status(404).json({ error: 'User not found' });
-        }
-    } catch (err) {
-        res.status(500).json({ error: 'Server error' });
     }
 };

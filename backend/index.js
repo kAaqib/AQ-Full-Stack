@@ -10,6 +10,37 @@ const userRoutes = require('./routes/userRoutes');
 const draftRoutes = require('./routes/draftRoutes');
 const pino = require('pino')
 
+const swaggerjsdoc = require('swagger-jsdoc');
+const swaggerui = require('swagger-ui-express');
+
+const swaggerOptions = {
+    swaggerDefinition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'Apna Quiz API',
+            description: 'Quiz API Information',
+        },
+        servers: [
+            {
+                url: "http://127.0.0.1:3000"
+            }
+        ],
+        tags: [
+            {
+                name: 'Users',
+                description: 'User-related operations',
+            },
+            {
+                name: 'Quizzes',
+                description: 'Quiz-related operations',
+            }
+        ],
+    },
+    apis: ['./routes/*.js']
+}
+const swaggerDocs = swaggerjsdoc(swaggerOptions)
+app.use('/api-docs', swaggerui.serve, swaggerui.setup(swaggerDocs))
+
 const Quiz = require('./models/quizModel');
 const Login = require('./models/loginModel');
 

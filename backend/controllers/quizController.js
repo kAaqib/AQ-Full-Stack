@@ -1,5 +1,4 @@
 const Quiz = require('../models/quizModel');
-const Draft = require('../models/draftModel');
 const Login = require('../models/loginModel');
 const Answered = require('../models/answerModel');
 const transformFormData = require('../utils/transformFormData');
@@ -27,13 +26,13 @@ exports.checkCode = async (req, res) => {
     if (/[a-zA-Z]/.test(code)) {
         try {
             let quiz = await Quiz.findOne({ code: code });
-            let draft = await Draft.findOne({ code: code });
             if (quiz) {
-                res.status(400).json({ message: "Quiz code exists" });
-            } else if (draft) {
-                res.status(200).json({ message: "Draft code exists" });
+                if (quiz.status)
+                    res.status(400).json({ message: "Quiz code exists" });
+                else
+                    res.status(400).json({ message: "Quiz is inactive" });
             } else {
-                res.status(200).json({ message: "lesgooo" });
+                res.status(400).json({ message: "lesgooo" });
             }
         } catch (error) {
             res.status(500).json({ error: 'Server error' });
@@ -43,6 +42,46 @@ exports.checkCode = async (req, res) => {
     }
 };
 
+exports.toggleStatus = async (req, res) => {
+    const quizCode = req.body.code;
+    const uname = req.body.username;
+    if (uname !== "" && quizCode !== "") {
+        try {
+            const user = await Login.findOne({ username: uname });
+            if (user) {
+                user.myquizzes.forEach(quiz => {
+                    if (quiz.code === quizCode) {
+                        if (quiz.status) {
+                            quiz.status = false;
+                        } else {
+                            quiz.status = true;
+                        }
+                    }
+                })
+                await user.save();
+            } else {
+                res.status(404).json({ error: "User not found" });
+            }
+            const quiz = await Quiz.findOne({ code: quizCode });
+            if (quiz) {
+                if (quiz.status) {
+                    quiz.status = false;
+                } else {
+                    quiz.status = true;
+                }
+                await quiz.save();
+                res.status(200).json(user.myquizzes);
+            } else {
+                res.status(404).json({ error: "Quiz not found" });
+            }
+        } catch (error) {
+            res.status(500).json({ error: 'Quiz not found' });
+        }
+    } else {
+        res.status(400).json({ error: "Quiz code cannot be empty" });
+    }
+}
+
 exports.saveQuiz = async (req, res) => {
     let date = new Date();
     const transformedData = transformFormData(req.body);
@@ -50,21 +89,21 @@ exports.saveQuiz = async (req, res) => {
     const quizCode = transformedData.quizCode;
     const questions = transformedData.questions;
     const editflag = transformedData.editflag;
-    await Draft.deleteOne({ code: quizCode });
     const quiz = await Quiz.findOne({ code: quizCode });
     let quizCodenDate = {
         code: quizCode,
+        status: true,
         lastupdate: date
     };
     if (editflag === "false" && !quiz) {
         const user = await Login.findOne({ username: username });
-        user.mydrafts = user.mydrafts.filter(arr => arr.code !== quizCode);
         user.myquizzes.push(quizCodenDate);
         await user.save();
 
         const newQuiz = new Quiz({
             code: quizCode,
-            questions: Object.values(questions)
+            questions: Object.values(questions),
+            status: true
         });
 
         newQuiz.save()
@@ -72,7 +111,6 @@ exports.saveQuiz = async (req, res) => {
             .catch(error => res.status(500).json({ message: 'Internal server error' }));
     } else if (editflag === "true") {
         const user = await Login.findOne({ username: username });
-        user.mydrafts = user.mydrafts.filter(arr => arr.code !== quizCode);
         user.myquizzes = user.myquizzes.filter(quiz => quiz.code !== quizCode);
         user.myquizzes.push(quizCodenDate);
         await user.save();
@@ -87,7 +125,8 @@ exports.saveQuiz = async (req, res) => {
         } else {
             const newQuiz = new Quiz({
                 code: quizCode,
-                questions: Object.values(questions)
+                questions: Object.values(questions),
+                status: true
             });
 
             newQuiz.save()
@@ -198,8 +237,8 @@ exports.getResponses = async (req, res) => {
 };
 
 exports.deleteQuiz = async (req, res) => {
-    const quizCode = req.params.code;
-    const uname = req.params.username;
+    const quizCode = req.body.code;
+    const uname = req.body.username;
     if (uname !== "" && quizCode !== "") {
         try {
             await Quiz.deleteOne({ code: quizCode });
@@ -220,8 +259,8 @@ exports.deleteQuiz = async (req, res) => {
 };
 
 exports.getReview = async (req, res) => {
-    let username = req.params.username;
-    let code = req.params.code;
+    let username = req.body.username;
+    let code = req.body.code;
     if (code !== undefined) {
         if (code.includes('"')) {
             code = code.slice(1, code.length - 1);
@@ -268,7 +307,7 @@ exports.getViewQuiz = async (req, res) => {
 };
 
 exports.getEditQuiz = async (req, res) => {
-    let code = req.params.code;
+    let code = req.body.code;
     if (code !== undefined) {
         try {
             const quiz = await Quiz.findOne({ code: code });

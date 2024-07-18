@@ -19,6 +19,7 @@ const QuizSchema = new mongoose.Schema({
     code: { type: String, unique: true },
     questions: [QuestionSchema],
     scores: [ScoreSchema],
+    status: Boolean,
     lastupdate: Date
 });
 
