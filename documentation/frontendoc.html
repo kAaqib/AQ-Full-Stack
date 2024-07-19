@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Frontend Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Apna Quiz Frontend Code Documentation</h1>
+    <h3> </h3>
+<section>
+
+<header>
+    
+        <h2>func.js</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description">This script manages the quiz table's interactions by adding event listeners to handle actions such
+as deleting quizzes, toggling their status, viewing responses, and editing quizzes. It uses event delegation to
+handle clicks on various buttons and updates the table and localStorage accordingly.</div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="func.js.html">func.js</a>, <a href="func.js.html#line519">line 519</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>func.js</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description">This script manages the editing of quiz details. It populates the quiz form with existing quiz data
+when in edit mode, and handles the creation of new quizzes or saving drafts. It also provides a logout functionality
+to redirect users to the home page.</div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="func.js.html">func.js</a>, <a href="func.js.html#line1146">line 1146</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>myquizzes.js</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description">This script fetches and displays the user's quizzes and their answers. It handles the creation
+of table rows for quizzes with actions to view, edit, delete, and toggle their status. It also handles fetching
+quiz responses and user answers, updating the respective tables.</div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="myquizzes.js.html">myquizzes.js</a>, <a href="myquizzes.js.html#line1">line 1</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>responses.js</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description">This script retrieves response data from localStorage and populates a table with scores. It formats
+the date of the response and provides buttons for reviewing individual responses.</div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="responses.js.html">responses.js</a>, <a href="responses.js.html#line1">line 1</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>review.js</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description">This script adds event listeners to elements with IDs 'myanstb' and 'quizrestb'.
+When the user clicks on elements with the 'review-quiz' class, it sends a request to review the quiz
+and redirects the user to the review page.</div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="review.js.html">review.js</a>, <a href="review.js.html#line1">line 1</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="intro.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#addQ">addQ</a></li><li><a href="global.html#answers">answers</a></li><li><a href="global.html#arr">arr</a></li><li><a href="global.html#code">code</a></li><li><a href="global.html#data">data</a></li><li><a href="global.html#deleteQuestion">deleteQuestion</a></li><li><a href="global.html#deselectAnswers">deselectAnswers</a></li><li><a href="global.html#edit">edit</a></li><li><a href="global.html#editflag">editflag</a></li><li><a href="global.html#getSelected">getSelected</a></li><li><a href="global.html#gk">gk</a></li><li><a href="global.html#loadQuiz">loadQuiz</a></li><li><a href="global.html#logout">logout</a></li><li><a href="global.html#moyq">moyq</a></li><li><a href="global.html#mqtb">mqtb</a></li><li><a href="global.html#myanstb">myanstb</a></li><li><a href="global.html#myquiztb">myquiztb</a></li><li><a href="global.html#qcode">qcode</a></li><li><a href="global.html#qno">qno</a></li><li><a href="global.html#quiz">quiz</a></li><li><a href="global.html#quizcip">quizcip</a></li><li><a href="global.html#quizreview">quizreview</a></li><li><a href="global.html#review">review</a></li><li><a href="global.html#startbtn">startbtn</a></li><li><a href="global.html#submitQuiz">submitQuiz</a></li><li><a href="global.html#topicEls">topicEls</a></li><li><a href="global.html#ttop10">ttop10</a></li><li><a href="global.html#uname">uname</a></li><li><a href="global.html#updateLeaderboard">updateLeaderboard</a></li><li><a href="global.html#username">username</a></li><li><a href="global.html#viewquiz">viewquiz</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Fri Jul 19 2024 14:35:24 GMT+0530 (India Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
