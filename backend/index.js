@@ -47,7 +47,6 @@ app.use('/api-docs', swaggerui.serve, swaggerui.setup(swaggerDocs));
 
 const Quiz = require('./models/quizModel');
 const Login = require('./models/loginModel');
-const { isAsyncFunction } = require('util/types');
 
 const logger = pino({
     transport: {
@@ -77,7 +76,8 @@ app.use(
         directives: {
             defaultSrc: ["'self'"],
             scriptSrc: ["'self'"],
-            styleSrc: ["'self'", "'unsafe-inline'"]
+            styleSrc: ["'self'", "'unsafe-inline'"],
+            frameSrc: ["http://scribehow.com/"]
         },
     })
 );
